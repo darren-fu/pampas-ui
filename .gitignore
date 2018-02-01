@@ -1,0 +1,26 @@
+.DS_Store
+node_modules/
+npm-debug.log
+.editorconfig
+dist/
+
+# idea ignore
+.idea/
+*.ipr
+*.iml
+*.iws
+
+
+.target/
+.logs/
+*/logs/
+*/*/logs/
+*/target/
+bin/
+
+# maven ignore
+target/
+*.war
+*.zip
+*.tar
+*.tar.gz

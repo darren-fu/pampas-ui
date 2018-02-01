@@ -1,0 +1,7 @@
+server.port: 7052
+
+spring:
+  application:
+    name: pampas-ui-service
+  profile:
+    active: default
