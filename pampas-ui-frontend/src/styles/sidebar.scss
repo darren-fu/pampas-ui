@@ -22,14 +22,14 @@
     .horizontal-collapse-transition {
       transition: 0s width ease-in-out, 0s padding-left ease-in-out, 0s padding-right ease-in-out;
     }
+    .el-scrollbar__bar.is-vertical{
+      right: 0px;
+    }
     .scrollbar-wrapper {
       overflow-x: hidden!important;
       .el-scrollbar__view {
         height: 100%;
       }
-    }
-    .el-scrollbar__bar.is-vertical{
-      right: 0px;
     }
     .is-horizontal {
       display: none;
@@ -117,6 +117,14 @@
     .main-container,
     .sidebar-container {
       transition: none;
+    }
+  }
+}
+
+.el-menu--vertical{
+  & >.el-menu{
+    .svg-icon{
+      margin-right: 16px;
     }
   }
 }
