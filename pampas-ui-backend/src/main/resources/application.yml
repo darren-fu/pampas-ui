@@ -1,7 +1,18 @@
-server.port: 7052
+server.port: 7777
 
 spring:
   application:
     name: pampas-ui-service
   profile:
     active: default
+
+#这个是时区，一定要加，否则会默认为格林尼治时间，即少8小时
+spring.jackson:
+  date-format: yyyy-MM-dd HH:mm:ss
+  time-zone: GMT+8
+pampas:
+  db:
+    driverClassName: com.mysql.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/pampas?useUnicode=true&characterEncoding=UTF-8&useSSL=false&zeroDateTimeBehavior=convertToNull&autoReconnect=true
+    username: root
+    password: 123456

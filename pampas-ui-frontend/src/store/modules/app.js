@@ -6,7 +6,8 @@ const app = {
       opened: !+Cookies.get('sidebarStatus'),
       withoutAnimation: false
     },
-    device: 'desktop'
+    device: 'desktop',
+    page_size: Cookies.get('pageSize') ? +Cookies.get('pageSize') : 20,
   },
   mutations: {
     TOGGLE_SIDEBAR: state => {
@@ -25,17 +26,25 @@ const app = {
     },
     TOGGLE_DEVICE: (state, device) => {
       state.device = device
+    },
+    CHANGE_PAGE_SIZE: (state, page_size) => {
+      console.log('page_size', page_size);
+      Cookies.set('pageSize', page_size)
+      state.page_size = page_size
     }
   },
   actions: {
-    ToggleSideBar: ({ commit }) => {
+    ToggleSideBar: ({commit}) => {
       commit('TOGGLE_SIDEBAR')
     },
-    CloseSideBar({ commit }, { withoutAnimation }) {
+    CloseSideBar({commit}, {withoutAnimation}) {
       commit('CLOSE_SIDEBAR', withoutAnimation)
     },
-    ToggleDevice({ commit }, device) {
+    ToggleDevice({commit}, device) {
       commit('TOGGLE_DEVICE', device)
+    },
+    ChangePageSize({commit}, page_size) {
+      commit('CHANGE_PAGE_SIZE', page_size)
     }
   }
 }
