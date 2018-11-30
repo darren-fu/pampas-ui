@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.pampas.ui.mapper.RouteRuleCustomMapper">
+    <resultMap id="BaseResultMap" type="com.github.pampas.storage.entity.GatewayRouteRuleRel">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="gateway_instance_id" jdbcType="VARCHAR" property="gatewayInstanceId" />
+        <result column="route_rule_id" jdbcType="INTEGER" property="routeRuleId" />
+        <result column="status" jdbcType="BIT" property="status" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+        <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+        <result column="is_del" jdbcType="BIT" property="isDel" />
+    </resultMap>
+    <resultMap id="FullResultMap" type="com.github.pampas.ui.entity.GatewayRouteRule"  extends="BaseResultMap">
+        <result column="rule_name" jdbcType="VARCHAR" property="ruleName" />
+        <result column="rule_remark" jdbcType="VARCHAR" property="ruleRemark" />
+        <result column="rule_status" jdbcType="BIT" property="ruleStatus" />
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="("
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="("
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <select id="selectGatewayRouteRules" resultMap="FullResultMap">
+       SELECT *
+        FROM p_route_rule t
+        WHERE t.id IN (
+        SELECT r.route_rule_id
+        FROM p_gateway_route_rule_rel r
+        WHERE r.`status` = TRUE)
+        ORDER BY t.id DESC
+
+    </select>
+
+
+</mapper>

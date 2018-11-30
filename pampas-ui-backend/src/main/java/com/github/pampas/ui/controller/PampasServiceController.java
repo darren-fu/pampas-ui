@@ -6,7 +6,6 @@ import com.github.pampas.ui.base.vo.Result;
 import com.github.pampas.ui.service.PampasServiceInfoService;
 import com.github.pampas.ui.vo.req.ServiceListReq;
 import com.github.pampas.ui.vo.req.ServiceSaveReq;
-import com.github.pampas.ui.vo.resp.InstanceResp;
 import com.github.pampas.ui.vo.resp.ServiceResp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

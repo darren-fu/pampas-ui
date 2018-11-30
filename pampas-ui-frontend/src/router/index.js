@@ -65,7 +65,7 @@ export const constantRouterMap = [
         path: 'add',
         name: 'service-add',
         component: () => import('@/views/service/service-add'),
-        meta: {title: '添加服务', icon: 'edit'},
+        meta: {title: '添加服务', icon: 'edit', noCache: true},
         hidden: false
       },
       {
@@ -76,6 +76,62 @@ export const constantRouterMap = [
         hidden: true
       }
     ]
+  },
+  {
+    path: '/rule',
+    component: Layout,
+    redirect: '/rule/index',
+    name: 'rule',
+    meta: {title: '路由管理', icon: 'nested'},
+    hidden: false,
+    children: [{
+      path: 'index',
+      name: 'rule-index',
+      component: () => import('@/views/rule/index'),
+      meta: {title: '路由列表', icon: 'list'},
+
+    },
+      {
+        path: 'add',
+        name: 'rule-add',
+        component: () => import('@/views/rule/rule-edit'),
+        meta: {title: '新增路由', icon: 'edit'},
+      },
+      {
+        path: 'edit',
+        name: 'rule-edit',
+        component: () => import('@/views/rule/rule-edit'),
+        meta: {title: '配置路由', icon: 'edit'},
+        hidden: true
+      }]
+  },
+  {
+    path: '/gateway',
+    component: Layout,
+    redirect: '/gateway/index',
+    name: 'gateway',
+    meta: {title: '网关管理', icon: 'guide'},
+    hidden: false,
+    children: [{
+      path: 'index',
+      name: 'gateway-index',
+      component: () => import('@/views/gateway/index'),
+      meta: {title: '网关列表', icon: 'list'},
+
+    },
+      {
+        path: 'add',
+        name: 'gateway-add',
+        component: () => import('@/views/rule/rule-edit'),
+        meta: {title: '新增路由', icon: 'edit'},
+      },
+      {
+        path: 'edit',
+        name: 'gateway-edit',
+        component: () => import('@/views/rule/rule-edit'),
+        meta: {title: '配置路由', icon: 'edit'},
+        hidden: true
+      }]
   },
   {path: '*', redirect: '/404', hidden: true}
 ]

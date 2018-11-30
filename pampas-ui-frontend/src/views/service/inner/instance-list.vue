@@ -15,88 +15,84 @@
         <el-button type="primary" @click="doQueryAction()">查询</el-button>
       </el-form-item>
     </el-form>
-    <!--v-show="enable_search || tableData.length > 0"-->
 
     <el-table
       v-loading="listLoading"
       :data="tableData"
+      stripe
       empty-text="没有服务实例"
       header-row-class-name="tb_header"
-
-      stripe
-      style="width: 100%;margin-top: 10px">
-      <el-table-column
-        prop="id"
-        label="ID"
-        width="80">
-      </el-table-column>
-      <el-table-column
-        prop="instance_id"
-        label="实例ID"
-        width="120">
-      </el-table-column>
-      <el-table-column
-        prop="service_name"
-        label="服务名称"
-        width="120">
-      </el-table-column>
-      <el-table-column
-        prop="host"
-        label="地址"
-        width="120">
-      </el-table-column>
-      <el-table-column
-        prop="port"
-        label="端口"
-        width="60">
-      </el-table-column>
-      <el-table-column
-        prop="status"
-        label="状态"
-        width="80">
-      </el-table-column>
-      <el-table-column
-        prop="start_time"
-        label="启动时间"
-        width="120">
-      </el-table-column>
-      <el-table-column
-        prop="weight"
-        label="权重"
-        sortable
-        width="80">
-      </el-table-column>
-      <el-table-column
-        prop="version"
-        label="版本"
-        width="120"/>
-      <el-table-column
-        prop="warmup_seconds"
-        label="热机"
-        width="120"/>
-
-      <el-table-column
-        prop="props"
-        label="额外属性"
-        width="120"/>
-      <el-table-column
-        prop="insert_time"
-        label="创建时间"
-      />
-      <el-table-column
-        prop="remark"
-        label="备注"
-      />
-      >
-      <el-table-column
-        fixed="right"
-        label="操作"
-        width="180">
+      :row-class-name="tableRowClassName"
+      style="width: 100%;margin-top: 0px">
+      <el-table-column type="expand">
         <template slot-scope="scope">
-          <!--<el-button @click="doFetchLimitConfig(scope.row)" type="text" size="small">获取远程限流配置</el-button>-->
+          <el-form label-position="left" inline class="demo-table-expand" label-width="120px">
+            <el-form-item label="服务名称">
+              <span>{{ scope.row.service_name }}</span>
+            </el-form-item>
+            <el-form-item label="实例ID">
+              <span>{{ scope.row.instance_id }}</span>
+            </el-form-item>
+            <el-form-item label="地址">
+              <span>{{ scope.row.host }}</span>
+            </el-form-item>
+            <el-form-item label="主机名">
+              <span>{{ scope.row.host_name }}</span>
+            </el-form-item>
+            <el-form-item label="端口">
+              <span>{{ scope.row.port }}</span>
+            </el-form-item>
+            <el-form-item label="启动时间">
+              <span>{{ scope.row.start_time }}</span>
+            </el-form-item>
+            <el-form-item label="状态">
+              <span>{{ scope.row.status }}</span>
+            </el-form-item>
+            <el-form-item label="权重">
+              <span>{{ scope.row.weight }}</span>
+            </el-form-item>
+            <el-form-item label="版本">
+              <span>{{ scope.row.version }}</span>
+            </el-form-item>
+            <el-form-item label="热机耗时（秒）">
+              <span>{{ scope.row.warmup_seconds }}</span>
+            </el-form-item>
+            <el-form-item label="备注">
+              <span>{{ scope.row.remark }}</span>
+            </el-form-item>
+            <el-row v-for="(prop, index) in scope.row.prop_list"
+                    :key="index">
+              <el-col :span="12">
+                <el-form-item
+                  :label="'属性['+ ++index + ']'">
+                  <span>{{ prop.key }}</span>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-form-item
+                  :label="'属性值'">
+                  <span>{{ prop.value }}</span>
+                </el-form-item>
+              </el-col>
+            </el-row>
+          </el-form>
+        </template>
+      </el-table-column>
+      <el-table-column prop="id" label="ID" width="80"/>
+      <el-table-column prop="service_name" label="服务名称"/>
+      <el-table-column prop="host" label="地址"/>
+      <el-table-column prop="port" label="端口"/>
+      <el-table-column prop="status" label="状态"/>
+      <el-table-column prop="start_time" label="启动时间" min-width="110"/>
+      <el-table-column prop="weight" label="权重" sortable/>
+      <el-table-column prop="version" label="版本"/>
+
+      <el-table-column label="操作">
+        <template slot-scope="scope">
           <!--<el-button @click="doViewInfo(scope.row)" type="text" size="small">查看</el-button>-->
         </template>
       </el-table-column>
+
     </el-table>
     <div class="pagination-container">
       <el-pagination
@@ -148,7 +144,6 @@
       // 如果 `question` 发生改变，这个函数就会运行
       service_id: function (newVal, oldVal) {
         if (typeof (newVal) != 'undefined') {
-          console.log('newVal', newVal);
           this.doLoadByServiceId(newVal);
         }
       }
@@ -180,6 +175,13 @@
         //   this.listLoading = false
         // })
       },
+      tableRowClassName({row, rowIndex}) {
+        // return 'warning-row';
+        if (rowIndex % 2 != 0) {
+          return 'success-row';
+        }
+        return '';
+      },
 
       doChangePage(cur_page_num) {
         this.page_num = cur_page_num
@@ -196,5 +198,29 @@
 </script>
 
 <style scoped>
+  .demo-table-expand {
+    font-size: 0;
+  }
 
+  .demo-table-expand label {
+    width: 90px;
+    color: #99a9bf;
+  }
+
+  .demo-table-expand .el-form-item {
+    margin-right: 0;
+    margin-bottom: 0;
+    width: 50%;
+  }
+
+</style>
+
+<style>
+  .el-table .warning-row {
+    background-color: oldlace;
+  }
+
+  .el-table .success-row {
+    background-color: #f0f9eb;
+  }
 </style>

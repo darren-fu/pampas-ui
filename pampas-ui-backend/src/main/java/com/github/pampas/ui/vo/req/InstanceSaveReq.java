@@ -8,6 +8,7 @@ import lombok.Data;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * Description:
@@ -41,10 +42,23 @@ public class InstanceSaveReq implements Request {
 
     private Integer weight;
 
-    private Byte status;
+    private Integer status;
 
     private String group;
 
     private String remark;
+
+    private List<KeyAndVal> propList;
+
+    @Data
+    @ApiModel(value = "服务实例属性")
+    @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
+    public static class KeyAndVal implements Request{
+
+        @NotEmpty(message = "属性Key不能为空")
+        private String key;
+
+        private String value;
+    }
 
 }

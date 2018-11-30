@@ -3,9 +3,12 @@ package com.github.pampas.ui.vo.resp;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.github.pampas.storage.entity.ServiceInstance;
+import com.github.pampas.ui.vo.req.InstanceSaveReq;
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.util.List;
 
 /**
  * Description:
@@ -17,4 +20,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class InstanceResp extends ServiceInstance {
+
+    private List<InstanceSaveReq.KeyAndVal> propList;
+
 }

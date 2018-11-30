@@ -16,6 +16,6 @@ public class InstanceTools {
      * @return the string
      */
     public static String genInstanceId(ServiceInstance serviceInstance) {
-        return serviceInstance.getServiceName() + "_" + serviceInstance.getHost() + ":" + serviceInstance.getPort();
+        return serviceInstance.getServiceName() + "#" + serviceInstance.getHost() + ":" + serviceInstance.getPort();
     }
 }

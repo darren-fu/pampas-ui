@@ -3,22 +3,43 @@
 
     <el-form ref="service_form" :model="service_form" size="small" :rules="rules"
              label-width="120px"
+             label-position="left"
+             hide-required-asterisk
+             status-icon
              @submit.native.prevent>
-      <el-form-item label="服务名称"
-                    prop="service_name">
-        <el-input v-model="service_form.service_name"/>
-      </el-form-item>
-      <el-form-item label="备注"
-                    prop="host">
-        <el-input v-model="service_form.remark"/>
-      </el-form-item>
+      <el-row>
+        <el-col :span="20">
+          <el-form-item label="服务名称"
+                        prop="service_name">
+            <el-input v-model="service_form.service_name"/>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="20">
+          <el-form-item label="服务备注"
+                        prop="remark">
+            <el-input v-model="service_form.remark"/>
+          </el-form-item>
+        </el-col>
+      </el-row>
       <el-form-item>
         <el-button type="primary" @click="doSave">保存</el-button>
-        <el-button v-show="service_form.id" type="primary" @click="doAddInstance">添加实例</el-button>
+        <el-button v-show="service_form.id" type="" @click="doAddInstance">添加实例</el-button>
       </el-form-item>
     </el-form>
-    <instance-list ref="instance_list" v-show="service_form.id" :enable_page="false" :enable_search="false"
-                   :service_id="service_form.id"></instance-list>
+
+    <el-tabs value="first" v-show="service_form.id" type="border-card" >
+      <el-tab-pane label="服务实例列表" name="first">
+        <instance-list ref="instance_list" v-show="service_form.id" :enable_page="false" :enable_search="false"
+                       :service_id="service_form.id"></instance-list>
+      </el-tab-pane>
+      <el-tab-pane label="网关列表" name="second">
+        xxx
+      </el-tab-pane>
+
+    </el-tabs>
+
 
     <el-dialog :title="dialogFormTitle" :visible.sync="dialogFormVisible" @close="doCloseDialog">
       <instance-edit :show.sync="dialogFormVisible" :cur_service_id="service_form.id"

@@ -15,14 +15,17 @@
   },
   "dependencies": {
     "axios": "0.18.0",
-    "element-ui": "2.4.6",
+    "element-ui": "2.4.11",
     "js-cookie": "2.2.0",
+    "js-yaml": "^3.12.0",
+    "mockjs": "1.0.1-beta3",
+    "moment": "^2.22.2",
+    "monaco-editor": "^0.15.5",
     "normalize.css": "7.0.0",
     "nprogress": "0.2.0",
     "vue": "2.5.17",
     "vue-router": "3.0.1",
-    "vuex": "3.0.1",
-    "mockjs": "1.0.1-beta3"
+    "vuex": "3.0.1"
   },
   "devDependencies": {
     "autoprefixer": "8.5.0",
@@ -47,6 +50,7 @@
     "friendly-errors-webpack-plugin": "1.7.0",
     "html-webpack-plugin": "4.0.0-alpha",
     "mini-css-extract-plugin": "0.4.1",
+    "monaco-editor-webpack-plugin": "^1.6.0",
     "node-notifier": "5.2.1",
     "node-sass": "^4.7.2",
     "optimize-css-assets-webpack-plugin": "5.0.0",

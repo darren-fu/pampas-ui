@@ -15,8 +15,6 @@ const tagsView = {
     ADD_CACHED_VIEW: (state, view) => {
       if (state.cachedViews.includes(view.name)) return
       if (!view.meta.noCache) {
-        console.log('noCache', view.meta.noCache)
-
         state.cachedViews.push(view.name)
       }
     },
@@ -67,7 +65,6 @@ const tagsView = {
   },
   actions: {
     addView({dispatch}, view) {
-      console.log('view', view)
       dispatch('addVisitedView', view)
       dispatch('addCachedView', view)
     },

@@ -1,8 +1,11 @@
 <template>
-  <service-modify :id="service_id"></service-modify>
+  <div class="app-container">
+    <service-modify :id="service_id"></service-modify>
+  </div>
 </template>
 
 <script>
+
   import ServiceModify from './inner/service-modify'
 
   export default {

@@ -1,6 +1,5 @@
 package com.github.pampas.ui.service.base;
 
-import com.github.pampas.common.discover.ServerInstance;
 import com.github.pampas.storage.entity.ServiceInstance;
 import com.github.pampas.ui.base.vo.Result;
 

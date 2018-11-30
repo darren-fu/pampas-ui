@@ -49,12 +49,12 @@ queryString.stringify = function (obj) {
         return encodeURIComponent(key) + '=' + encodeURIComponent(val2);
       }).join('&');
     }
-
     return encodeURIComponent(key) + '=' + encodeURIComponent(val);
   }).join('&') : '';
 };
 
 queryString.push = function (key, new_value) {
+  console.log('location.search',location.search, 'window.location.pathname',window.location.pathname)
   var params = queryString.parse(location.search);
   params[key] = new_value;
   var new_params_string = queryString.stringify(params)

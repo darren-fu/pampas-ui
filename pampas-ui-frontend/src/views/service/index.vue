@@ -1,19 +1,8 @@
 <template>
   <div class="app-container">
-    <el-form :inline="true" :model="form" size="mini" class="demo-form-inline">
-
+    <el-form :inline="true" :model="form" size="medium" class="demo-form-inline">
       <el-form-item label="服务名">
-
         <el-input v-model="form.service_name"></el-input>
-
-        <!--<el-select v-model="form.service_name" :clearable="true" filterable default-first-option placeholder="请选择">-->
-        <!--<el-option-->
-        <!--v-for="item in services"-->
-        <!--:key="item"-->
-        <!--:label="item"-->
-        <!--:value="item">-->
-        <!--</el-option>-->
-        <!--</el-select>-->
       </el-form-item>
 
       <el-form-item>
@@ -26,7 +15,7 @@
     <el-table
       v-loading="listLoading"
       :data="tableData"
-      size="mini"
+      size="medium"
       header-row-class-name="tb_header"
       stripe
       style="width: 100%;margin-top: 10px">

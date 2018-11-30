@@ -5,100 +5,92 @@
              @submit.native.prevent>
       <el-row>
         <el-col :span="12">
-          <el-form-item label="服务名称"
-                        prop="service_name">
+          <el-form-item label="服务名称" prop="service_name">
             <el-input v-model="instance_form.service_name" :readonly="specific_service"/>
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="服务地址"
-                        prop="host">
+          <el-form-item label="服务地址" prop="host">
             <el-input v-model="instance_form.host"/>
           </el-form-item>
         </el-col>
       </el-row>
       <el-row>
         <el-col :span="12">
-          <el-form-item label="主机名称"
-                        prop="host_name">
+          <el-form-item label="主机名称" prop="host_name">
             <el-input v-model="instance_form.host_name"/>
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="服务端口"
-                        prop="port">
+          <el-form-item label="服务端口" prop="port">
             <el-input v-model="instance_form.port"/>
           </el-form-item>
         </el-col>
       </el-row>
       <el-row>
         <el-col :span="12">
-          <el-form-item label="版本"
-                        prop="version">
+          <el-form-item label="版本" prop="version">
             <el-input v-model="instance_form.version"/>
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="权重"
-                        prop="weight">
+          <el-form-item label="权重" prop="weight">
             <el-input v-model="instance_form.weight"/>
           </el-form-item>
         </el-col>
       </el-row>
-
       <el-row>
         <el-col :span="12">
-          <el-form-item label="启动时间"
-                        prop="start_time">
-            <el-input v-model="instance_form.start_time"/>
+          <el-form-item label="启动时间" prop="start_time">
+            <el-date-picker
+              v-model="instance_form.start_time"
+              type="datetime"
+              value-format="yyyy-MM-dd HH:mm:ss"
+              placeholder="请选择时间">
+            </el-date-picker>
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="状态"
-                        prop="status">
-            <el-input v-model="instance_form.status"/>
+          <el-form-item label="状态" prop="status">
+            <el-radio-group v-model="instance_form.status" size="small">
+              <el-radio-button label="1">正常</el-radio-button>
+              <el-radio-button label="0">停用</el-radio-button>
+              <el-radio-button label="-1">失效</el-radio-button>
+            </el-radio-group>
           </el-form-item>
         </el-col>
       </el-row>
       <el-row>
         <el-col :span="12">
-          <el-form-item label="所属机房"
-                        prop="room">
+          <el-form-item label="所属机房" prop="room">
             <el-input v-model="instance_form.room"/>
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="热机耗时"
-                        prop="warmup_seconds">
+          <el-form-item label="热机耗时（秒）" prop="warmup_seconds">
             <el-input v-model="instance_form.warmup_seconds"/>
           </el-form-item>
         </el-col>
       </el-row>
-      <el-form-item label="备注"
-                    prop="remark">
+      <el-form-item label="备注" prop="remark">
         <el-input v-model="instance_form.remark"/>
       </el-form-item>
-      <!--
-       :rules="{
-            required: true, message: '属性不能为空', trigger: 'blur'
-          }"
-      -->
-      <el-row v-for="(prop, index) in instance_form.props"
-              :key="prop.idx"
-      >
+
+      <el-row v-for="(prop, index) in instance_form.prop_list"
+              :key="prop.idx">
         <el-col :span="12">
           <el-form-item
-            :label="'属性'"
-            :prop="'props.' + index + '.key'"
+            :label="'属性['+ (index+1) + ']'"
+            :prop="'prop_list.' + index + '.key'"
+
+            :rules="{      required: true, message: '属性名不能为空', trigger: 'blur'    }"
           >
             <el-input size="mini" v-model="prop.key"></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="9">
-          <el-form-item
-            :label="'属性值'"
-            :prop="'props.' + index + '.value'"
-          >
+          <el-form-item :label="'属性值'"
+                        :prop="'prop_list.' + index + '.value'">
             <el-input size="mini" v-model="prop.value"></el-input>
           </el-form-item>
         </el-col>
@@ -106,11 +98,9 @@
           <el-form-item label-width="15px">
             <el-button type="warning" icon="el-icon-delete" size="mini" circle
                        @click.prevent="removeProp(prop)"></el-button>
-            <!--<el-button @click.prevent="removeProp(domain)" style="color: #C21F39" type="text" size="mini">删除属性</el-button>-->
           </el-form-item>
         </el-col>
       </el-row>
-
 
       <el-row>
         <el-col :span="24">
@@ -127,6 +117,7 @@
 
 <script>
   import {get_instance, save_instance} from '@/api/instance'
+  import moment from 'moment'
 
   export default {
     name: "instance-edit",
@@ -146,12 +137,13 @@
           host_name: undefined,
           port: undefined,
           room: undefined,
-          weight: undefined,
+          weight: 100,
           version: undefined,
-          status: undefined,
-          warmup_seconds: undefined,
+          status: 1,
+          warmup_seconds: 600,
+          start_time: undefined,
           remark: undefined,
-          props: []
+          prop_list: []
         },
         rules: {
           service_name: [{required: true, message: '必须提供服务名称'}],
@@ -166,7 +158,15 @@
         return this.cur_service_id ? true : false
       }
     },
+    watch: {
+      show: function (newVal, oldVal) {
+        if (newVal && this.cur_service_id) {
+          this.instance_form.start_time = moment().format('YYYY-MM-DD HH:mm:ss');
+        }
+      }
+    },
     created() {
+      this.instance_form.start_time = moment().format('YYYY-MM-DD HH:mm:ss');
       if (this.id) {
         this.instance_form.id = this.id;
         this.doLoad()
@@ -187,29 +187,35 @@
         }
       },
       doSaveInstance() {
-        save_instance(this.instance_form).then(resp => {
-          this.instance_form = resp
-          this.$emit('update:show', false)
-        })
+        this.$refs.instance_form.validate((valid) => {
+          if (valid) {
+            save_instance(this.instance_form).then(resp => {
+              this.$emit('update:show', false)
+              this.$refs.instance_form.resetFields()
+            })
+          } else {
+            return false;
+          }
+        });
+
       },
       doCancel() {
-        this.$refs.instance_form.resetFields()
         this.$emit('update:show', false)
+        this.$refs.instance_form.resetFields()
       },
       addProp() {
-        this.instance_form.props.push({
+        this.instance_form.prop_list.push({
           idx: Date.now(),
           key: '',
           value: '',
         });
       },
       removeProp(item) {
-        var index = this.instance_form.props.indexOf(item)
+        var index = this.instance_form.prop_list.indexOf(item)
         if (index !== -1) {
-          this.instance_form.props.splice(index, 1)
+          this.instance_form.prop_list.splice(index, 1)
         }
       },
-
     }
   }
 </script>

@@ -26,16 +26,15 @@ public class Result<T> implements Serializable {
     @ApiModelProperty(notes = "元数据")
     private Integer count;
 
-    public static <E> Result<E> buildResult(List<E> data, Integer count) {
+    public static <E> Result<E> buildResult(List<E> data, Number count) {
         Result<E> result = new Result<E>();
         if (data == null) {
             // 保证返回列表不是null
             data = Collections.EMPTY_LIST;
         }
         result.setData(data);
-        result.setCount(count);
+        result.setCount(count == null ? 0 : count.intValue());
         return (Result<E>) result;
-
     }
 
 
