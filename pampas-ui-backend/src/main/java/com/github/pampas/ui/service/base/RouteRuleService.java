@@ -1,6 +1,7 @@
 package com.github.pampas.ui.service.base;
 
 import com.github.pampas.storage.entity.GatewayInstance;
+import com.github.pampas.storage.entity.GatewayRouteRuleRel;
 import com.github.pampas.storage.entity.RouteRule;
 import com.github.pampas.ui.base.vo.Result;
 
@@ -33,6 +34,16 @@ public interface RouteRuleService {
      */
     Result<RouteRule> getRouteRuleList(String name, Boolean status, Integer pageNum, Integer pageSize);
 
+
+    /**
+     * Gets route rule rel gateway.
+     *
+     * @param ruleId the rule id
+     * @return the route rule rel gateway
+     */
+    List<GatewayRouteRuleRel> getRouteRuleRelList(Integer ruleId);
+
+
     /**
      * Gets route rule rel gateway.
      *
@@ -55,4 +66,14 @@ public interface RouteRuleService {
      * @param ruleId the rule id
      */
     void delete(Integer ruleId);
+
+
+    /**
+     * 路由规则关联网关
+     *
+     * @param ruleId
+     * @param gatewayIdList
+     */
+    void saveRel(Integer ruleId, List<Integer> gatewayIdList);
+
 }

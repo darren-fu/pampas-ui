@@ -117,20 +117,12 @@ export const constantRouterMap = [
       name: 'gateway-index',
       component: () => import('@/views/gateway/index'),
       meta: {title: '网关列表', icon: 'list'},
-
     },
       {
         path: 'add',
-        name: 'gateway-add',
-        component: () => import('@/views/rule/rule-edit'),
-        meta: {title: '新增路由', icon: 'edit'},
-      },
-      {
-        path: 'edit',
-        name: 'gateway-edit',
-        component: () => import('@/views/rule/rule-edit'),
-        meta: {title: '配置路由', icon: 'edit'},
-        hidden: true
+        name: 'gateway-rel-rule',
+        component: () => import('@/views/gateway/gateway-rel-rule'),
+        meta: {title: '关联路由', icon: 'drag'},
       }]
   },
   {path: '*', redirect: '/404', hidden: true}

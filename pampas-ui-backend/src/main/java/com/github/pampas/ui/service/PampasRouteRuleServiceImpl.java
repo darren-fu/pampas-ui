@@ -14,8 +14,10 @@ import com.github.pampas.ui.base.vo.Result;
 import com.github.pampas.ui.service.base.RouteRuleService;
 import com.github.pampas.ui.utils.BeanTools;
 import com.github.pampas.ui.vo.req.RouteRuleSaveReq;
+import com.github.pampas.ui.vo.req.RuleRelGatewaySaveReq;
 import com.github.pampas.ui.vo.resp.GatewayInstanceResp;
 import com.github.pampas.ui.vo.resp.RouteRuleResp;
+import com.github.pampas.ui.vo.resp.RouteRuleTreeResp;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +27,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Description:
@@ -60,6 +63,35 @@ public class PampasRouteRuleServiceImpl implements PampasRouteRuleService {
     }
 
     @Override
+    public Response<Result<RouteRuleTreeResp>> getRouteRuleTree() {
+        Result<RouteRule> routeRuleList = routeRuleService.getRouteRuleList(null, null, null, null);
+        if (routeRuleList.getCount() == 0) {
+            return Response.buildSuccessEmptyResponse();
+        }
+        int groupId = -1;
+
+        Map<String, List<RouteRule>> routeRuleListMap = routeRuleList.getData().stream().collect(Collectors.groupingBy(RouteRule::getGroup));
+        List<RouteRuleTreeResp> treeList = new ArrayList<>();
+        for (Map.Entry<String, List<RouteRule>> entry : routeRuleListMap.entrySet()) {
+            RouteRuleTreeResp ruleTreeResp = new RouteRuleTreeResp();
+            ruleTreeResp.setId(--groupId);
+            ruleTreeResp.setLabel("规则分组：" + entry.getKey());
+
+            List<RouteRuleTreeResp.RuleTreeItem> treeItemList = entry.getValue().stream().map(v -> {
+                RouteRuleTreeResp.RuleTreeItem treeItem = new RouteRuleTreeResp.RuleTreeItem();
+                treeItem.setId(v.getId());
+                treeItem.setLabel("[" + v.getId() + "]" + v.getName() + " " + v.getMappingHost());
+                treeItem.setGroup(v.getGroup());
+                treeItem.setStatus(v.getStatus());
+                return treeItem;
+            }).collect(Collectors.toList());
+            ruleTreeResp.setChildren(treeItemList);
+            treeList.add(ruleTreeResp);
+        }
+        return Response.buildSuccessResponseWithResult(treeList, treeList.size());
+    }
+
+    @Override
     public Response<Result<GatewayInstanceResp>> getRouteRuleRelGateway(Integer ruleId) {
         List<GatewayInstance> routeRuleRelGateway = routeRuleService.getRouteRuleRelGateway(ruleId);
         List<GatewayInstanceResp> gatewayInstanceRespList = BeanTools.copyBeans(routeRuleRelGateway, GatewayInstanceResp.class);
@@ -85,8 +117,8 @@ public class PampasRouteRuleServiceImpl implements PampasRouteRuleService {
                     AbstractRule rule = null;
                     if (RuleTypeEnum.HTTP.getValue().equals(type)) {
                         rule = jsonTools.fromJson(json, HttpRule.class);
-                        AssertTools.isTrue(((HttpRule) rule).getMappingStrategy() != null, "非法的路径映射策略:" + ruleMap.get("mapping_strategy"));
-                        AssertTools.isTrue(((HttpRule) rule).getHostStrategy() != null, "非法的目标服务地址匹配策略:" + ruleMap.get("host_strategy"));
+                        AssertTools.isTrue(rule.getMappingStrategy() != null, "非法的路径映射策略:" + ruleMap.get("mapping_strategy"));
+                        AssertTools.isTrue(rule.getHostStrategy() != null, "非法的目标服务地址匹配策略:" + ruleMap.get("host_strategy"));
 
                     } else if (RuleTypeEnum.DUBBO.getValue().equals(type)) {
                         rule = jsonTools.fromJson(json, DubboRule.class);
@@ -117,4 +149,12 @@ public class PampasRouteRuleServiceImpl implements PampasRouteRuleService {
     public void delete(Integer ruleId) {
         routeRuleService.delete(ruleId);
     }
+
+    @Override
+    public Response saveRel(RuleRelGatewaySaveReq req) {
+        AssertTools.notEmpty(req.getRuleIdList(), "路由规则不能为空");
+        routeRuleService.saveRel(req.getRuleIdList().get(0), req.getGatewayIdList());
+        return Response.buildSuccessEmptyResponse();
+    }
+
 }

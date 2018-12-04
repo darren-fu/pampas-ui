@@ -4,8 +4,10 @@ import com.github.pampas.ui.base.IngressService;
 import com.github.pampas.ui.base.vo.Response;
 import com.github.pampas.ui.base.vo.Result;
 import com.github.pampas.ui.vo.req.RouteRuleSaveReq;
+import com.github.pampas.ui.vo.req.RuleRelGatewaySaveReq;
 import com.github.pampas.ui.vo.resp.GatewayInstanceResp;
 import com.github.pampas.ui.vo.resp.RouteRuleResp;
+import com.github.pampas.ui.vo.resp.RouteRuleTreeResp;
 
 /**
  * Description:
@@ -30,6 +32,10 @@ public interface PampasRouteRuleService extends IngressService {
      */
     Response<Result<RouteRuleResp>> getRouteRuleList(String name, Boolean status, Integer pageNum, Integer pageSize);
 
+
+    Response<Result<RouteRuleTreeResp>> getRouteRuleTree();
+
+
     /**
      * 获取路由规则关联的网关实例
      *
@@ -52,4 +58,7 @@ public interface PampasRouteRuleService extends IngressService {
      * @param ruleId the rule id
      */
     void delete(Integer ruleId);
+
+    Response saveRel(RuleRelGatewaySaveReq req);
+
 }

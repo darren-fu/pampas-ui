@@ -38,7 +38,7 @@
         width="120">
       </el-table-column>
       <el-table-column
-        prop="name"
+        prop="server_name"
         label="名称"
         width="120">
       </el-table-column>
@@ -77,14 +77,14 @@
       <el-table-column
         prop=""
         label=""/>
-      <el-table-column
-        fixed="right"
-        label="操作"
-        width="120">
-        <template slot-scope="scope">
-          <el-button @click="doViewInfo(scope.row)" type="text" size="small">查看</el-button>
-        </template>
-      </el-table-column>
+      <!--<el-table-column-->
+        <!--fixed="right"-->
+        <!--label="操作"-->
+        <!--width="120">-->
+        <!--<template slot-scope="scope">-->
+          <!--<el-button @click="doViewInfo(scope.row)" type="text" size="small"></el-button>-->
+        <!--</template>-->
+      <!--</el-table-column>-->
     </el-table>
     <div class="pagination-container">
       <el-pagination

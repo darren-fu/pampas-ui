@@ -7,14 +7,20 @@ import com.github.pampas.storage.mapper.GatewayRouteRuleRelMapper;
 import com.github.pampas.storage.mapper.RouteRuleMapper;
 import com.github.pampas.ui.base.vo.Result;
 import com.github.pampas.ui.mapper.RouteRuleCustomMapper;
+import com.github.pampas.ui.utils.IteratorTools;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -38,6 +44,9 @@ public class RouteRuleServiceImpl implements RouteRuleService {
 
     @Autowired
     private GatewayInstanceMapper gatewayInstanceMapper;
+
+    @Autowired
+    private GatewayInstanceService gatewayInstanceService;
 
     @Override
     public RouteRule getRouteRule(Integer ruleId) {
@@ -69,15 +78,18 @@ public class RouteRuleServiceImpl implements RouteRuleService {
         if (status != null) {
             criteria.andStatusEqualTo(status);
         }
-        condition.setPageInfo(pageNum, pageSize);
+        Long count = null;
+        if (pageNum != null && pageSize != null) {
+            condition.setPageInfo(pageNum, pageSize);
+            count = routeRuleMapper.countByExample(condition);
+        }
         condition.orderBy("id desc");
-        long count = routeRuleMapper.countByExample(condition);
         List<RouteRule> routeRuleList = routeRuleMapper.selectByExample(condition);
-        return Result.buildResult(routeRuleList, count);
+        return Result.buildResult(routeRuleList, count == null ? routeRuleList.size() : count);
     }
 
     @Override
-    public List<GatewayInstance> getRouteRuleRelGateway(Integer ruleId) {
+    public List<GatewayRouteRuleRel> getRouteRuleRelList(Integer ruleId) {
         //确认rule存在
         RouteRule routeRule = this.getRouteRule(ruleId);
         AssertTools.notNull(routeRule, "不存在的路由规则" + ruleId);
@@ -85,9 +97,19 @@ public class RouteRuleServiceImpl implements RouteRuleService {
         GatewayRouteRuleRelCondition relCondition = new GatewayRouteRuleRelCondition();
         relCondition.createCriteria().andRouteRuleIdEqualTo(ruleId);
         List<GatewayRouteRuleRel> gatewayRouteRuleRelList = gatewayRouteRuleRelMapper.selectByExample(relCondition);
+        log.info("查询网关和路由关联列表:{}", gatewayRouteRuleRelList);
+        return gatewayRouteRuleRelList;
+    }
 
-        List<String> gatewayInstanceIdList = gatewayRouteRuleRelList.stream().map(GatewayRouteRuleRel::getGatewayInstanceId).distinct().collect(Collectors.toList());
+    @Override
+    public List<GatewayInstance> getRouteRuleRelGateway(Integer ruleId) {
+        List<GatewayRouteRuleRel> routeRuleRelList = this.getRouteRuleRelList(ruleId);
+        List<String> gatewayInstanceIdList = routeRuleRelList.stream().map(GatewayRouteRuleRel::getGatewayInstanceId).distinct().collect(Collectors.toList());
         log.info("查询{}关联的网关ID:{}", ruleId, ArrayUtils.toString(gatewayInstanceIdList));
+
+        if (CollectionUtils.isEmpty(gatewayInstanceIdList)) {
+            return Collections.EMPTY_LIST;
+        }
         GatewayInstanceCondition condition = new GatewayInstanceCondition();
         condition.createCriteria().andInstanceIdIn(gatewayInstanceIdList);
         List<GatewayInstance> gatewayInstanceList = gatewayInstanceMapper.selectByExample(condition);
@@ -95,6 +117,7 @@ public class RouteRuleServiceImpl implements RouteRuleService {
     }
 
     @Override
+    @Transactional
     public RouteRule save(RouteRule routeRule) {
         if (routeRule.getId() != null) {
             int i = routeRuleMapper.updateByPrimaryKeySelective(routeRule);
@@ -109,11 +132,50 @@ public class RouteRuleServiceImpl implements RouteRuleService {
     }
 
     @Override
+    @Transactional
     public void delete(Integer ruleId) {
         AssertTools.notNull(ruleId, "id不能为空");
         int i = routeRuleMapper.deleteByPrimaryKey(ruleId);
         AssertTools.isTrue(i == 1, "删除失败");
         log.info("删除路由规则成功:{}", ruleId);
+    }
+
+    @Override
+    @Transactional
+    public void saveRel(Integer ruleId, List<Integer> gatewayIdList) {
+        AssertTools.notNull(ruleId, "路由规则不能为空");
+        RouteRule routeRule = this.getRouteRule(ruleId);
+        AssertTools.notNull(routeRule, "不存在的路由规则");
+//        AssertTools.notEmpty(gatewayIdList, "网关不能为空");
+        List<GatewayInstance> relGatewayList = this.getRouteRuleRelGateway(ruleId);
+        List<String> instanceIdList = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(gatewayIdList)) {
+            List<GatewayInstance> gatewayInstanceList = gatewayInstanceService.getGateway(gatewayIdList.toArray(new Integer[0]));
+            Map<Integer, String> gatewayIdMap = IteratorTools.toMap(gatewayInstanceList, GatewayInstance::getId, GatewayInstance::getInstanceId);
+            for (Integer gid : gatewayIdList) {
+                AssertTools.isTrue(gatewayIdMap.containsKey(gid), "不存在的网关:" + gid);
+                instanceIdList.add(gatewayIdMap.get(gid));
+            }
+        }
+
+        GatewayRouteRuleRelCondition relCondition = new GatewayRouteRuleRelCondition();
+        GatewayRouteRuleRelCondition.Criteria criteria = relCondition.createCriteria();
+        criteria.andRouteRuleIdEqualTo(ruleId);
+        int num = gatewayRouteRuleRelMapper.deleteByExample(relCondition);
+        log.info("删除网关和路由规则关系:{}",num);
+
+        if (instanceIdList.size() > 0) {
+            for (String instanceId : instanceIdList) {
+                GatewayRouteRuleRel routeRuleRel = new GatewayRouteRuleRel();
+                routeRuleRel.setRouteRuleId(ruleId);
+                routeRuleRel.setGatewayInstanceId(instanceId);
+                int i = gatewayRouteRuleRelMapper.insertSelective(routeRuleRel);
+                AssertTools.isTrue(i == 1, "插入失败");
+                log.info("新增网关和路由规则关系:{}",routeRuleRel);
+
+            }
+        }
+        log.info("保存路由规则:{} 和网关关系成功:{}", ruleId, gatewayIdList);
     }
 }
 

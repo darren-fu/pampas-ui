@@ -3,12 +3,12 @@
     <el-tabs v-model="tab_name" :before-leave="switchTab" stretch>
 
       <el-tab-pane label="使用表单配置路由规则" name="form" lazy>
-        <el-form ref="rule_list_form" :model="rule_form" size="small" :rules="valid_rules"
+        <el-form ref="rule_list_form" class="rule_form" :model="rule_form" size="mini" :rules="valid_rules"
                  label-width="120px" hide-required-asterisk
                  @submit.native.prevent>
           <el-row>
             <el-col :span="24" v-for="(rule, index) in rule_form.rule_list" :key="index" :offset="index > 0 ? 0 : 0">
-              <el-card shadow="hover" :body-style="{ padding: '10px'}" style="margin: 5px;border: 1px solid #808080;">
+              <el-card shadow="hover" :body-style="{ padding: '5px'}" style="margin: 5px;border: 1px solid #808080;">
                 <el-row>
                   <el-col :span="12">
                     <el-form-item label="规则类型" class="rule_label" :prop="'rule_list.' + index + '.type'"
@@ -79,7 +79,8 @@
       </el-tab-pane>
       <el-tab-pane key="save" name="save">
            <span slot="label" style="">
-                <el-button type="text" icon="el-icon-check" style="color:#aa0000;font-size: 15px">保存</el-button>
+                <!--<el-button type="text" icon="el-icon-check" style="color:#aa0000;font-size: 15px">保存</el-button>-->
+             <el-button type="primary" size="mini" icon="el-icon-check">保存</el-button>
            </span>
       </el-tab-pane>
     </el-tabs>
@@ -107,42 +108,42 @@
           id: undefined,
           rule_list: [],
         },
-        rule_form2: {
-          "id": 1,
-          rule_list: [
-            {
-              "type": "http",
-              "service": "test",
-              "path": "/test1",
-              "mapping_strategy": "appoint",
-              "mapping_path": "/t/1",
-              "host_strategy": "appoint",
-              "mapping_host": "http://www.google.com"
-            },
-            {
-              "service": "test",
-              "type": "http",
-              "path": "/test/test2/*",
-              "mapping_strategy": "strip",
-              "mapping_path": "/test",
-              "host_strategy": "appoint",
-              "mapping_host": "http://www.google.com"
-            },
-            {
-              "service": "test",
-              "type": "http",
-              "path": "/test/test3/*",
-              "mapping_strategy": "strip",
-              "mapping_path": "/test",
-              "host_strategy": "auto",
-            },
-            {
-              "service": "duoo-service",
-              "type": "dubbo",
-              "path": "/dubbo/test3/*",
-            }
-          ]
-        },
+        // rule_form2: {
+        //   "id": 1,
+        //   rule_list: [
+        //     {
+        //       "type": "http",
+        //       "service": "test",
+        //       "path": "/test1",
+        //       "mapping_strategy": "appoint",
+        //       "mapping_path": "/t/1",
+        //       "host_strategy": "appoint",
+        //       "mapping_host": "http://www.google.com"
+        //     },
+        //     {
+        //       "service": "test",
+        //       "type": "http",
+        //       "path": "/test/test2/*",
+        //       "mapping_strategy": "strip",
+        //       "mapping_path": "/test",
+        //       "host_strategy": "appoint",
+        //       "mapping_host": "http://www.google.com"
+        //     },
+        //     {
+        //       "service": "test",
+        //       "type": "http",
+        //       "path": "/test/test3/*",
+        //       "mapping_strategy": "strip",
+        //       "mapping_path": "/test",
+        //       "host_strategy": "auto",
+        //     },
+        //     {
+        //       "service": "duoo-service",
+        //       "type": "dubbo",
+        //       "path": "/dubbo/test3/*",
+        //     }
+        //   ]
+        // },
 
         valid_rules: {}
       }
@@ -255,5 +256,9 @@
     background-color: #fff;
     width: 110px;
     color: #111110;
+  }
+
+  .rule_form .el-form-item--mini.el-form-item{
+    margin-bottom: 6px;
   }
 </style>

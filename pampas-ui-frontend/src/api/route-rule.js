@@ -20,6 +20,18 @@ export function get_rule_list(name, status, page_num, page_size) {
   })
 }
 
+
+/**
+ * 获取路由规则树形结构
+ */
+export function get_rule_tree() {
+  return request({
+    url: '/route_rule/tree',
+    method: 'get',
+    params: {}
+  })
+}
+
 /**
  * 获取服务路由规则
  * @param form_data
@@ -31,6 +43,20 @@ export function get_route_rule(id) {
     params: {id: id}
   })
 }
+
+
+/**
+ * 获取服务路由关联的网关
+ * @param form_data
+ */
+export function get_route_rule_rel(rule_id) {
+  return request({
+    url: '/route_rule/rel_gateway',
+    method: 'get',
+    params: {id: rule_id}
+  })
+}
+
 
 /**
  * 保存服务路由规则
@@ -44,3 +70,16 @@ export function save_route_rule(form_data) {
   })
 }
 
+
+
+/**
+ * 保存服务路由规则
+ * @param form_data
+ */
+export function save_route_rule_rel(form_data) {
+  return request({
+    url: '/route_rule/save_rel',
+    method: 'post',
+    data: form_data
+  })
+}

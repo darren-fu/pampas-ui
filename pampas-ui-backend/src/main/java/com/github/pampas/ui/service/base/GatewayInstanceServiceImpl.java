@@ -1,13 +1,11 @@
 package com.github.pampas.ui.service.base;
 
 import com.github.pampas.common.tools.AssertTools;
-import com.github.pampas.storage.entity.GatewayInstance;
-import com.github.pampas.storage.entity.GatewayInstanceCondition;
-import com.github.pampas.storage.entity.GatewayRouteRuleRel;
-import com.github.pampas.storage.entity.GatewayRouteRuleRelCondition;
+import com.github.pampas.storage.entity.*;
 import com.github.pampas.storage.mapper.GatewayInstanceMapper;
 import com.github.pampas.storage.mapper.GatewayRouteRuleRelMapper;
 import com.github.pampas.ui.base.vo.Result;
+import com.github.pampas.ui.utils.IteratorTools;
 import com.github.pampas.ui.vo.req.GatewayInstanceListReq;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -15,11 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -39,10 +35,16 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
     @Autowired
     private GatewayRouteRuleRelMapper gatewayRouteRuleRelMapper;
 
+    @Autowired
+    private RouteRuleService routeRuleService;
 
     @Override
-    public GatewayInstance getGateway(Integer gatewayId) {
-        return gatewayInstanceMapper.selectByPrimaryKey(gatewayId);
+    public List<GatewayInstance> getGateway(Integer... gatewayId) {
+        GatewayInstanceCondition condition = new GatewayInstanceCondition();
+        GatewayInstanceCondition.Criteria criteria = condition.createCriteria();
+        criteria.andIdIn(Arrays.asList(gatewayId));
+
+        return gatewayInstanceMapper.selectByExample(condition);
     }
 
     @Override
@@ -66,7 +68,9 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
             criteria.andHostNameLike("%" + req.getHostName() + "%");
         }
         condition.orderBy("id desc");
-        condition.setPageInfo(pageNum, pageSize);
+        if (pageNum != null && pageSize != null) {
+            condition.setPageInfo(pageNum, pageSize);
+        }
         long count = gatewayInstanceMapper.countByExample(condition);
         List<GatewayInstance> gatewayInstances = gatewayInstanceMapper.selectByExample(condition);
         log.info("查询网关列表:{}", gatewayInstances);
@@ -75,11 +79,15 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
 
     @Override
     public Result<GatewayRouteRuleRel> getRouteRuleRel(Integer gatewayId) {
-        GatewayInstance gateway = this.getGateway(gatewayId);
+        List<GatewayInstance> gatewayInstanceList = this.getGateway(gatewayId);
+
+        if (CollectionUtils.isEmpty(gatewayInstanceList)) {
+            return Result.buildResult(Collections.EMPTY_LIST, 0);
+        }
+        GatewayInstance gateway = gatewayInstanceList.get(0);
         if (gateway == null) {
             return Result.buildResult(Collections.EMPTY_LIST, 0);
         }
-
         GatewayRouteRuleRelCondition condition = new GatewayRouteRuleRelCondition();
         GatewayRouteRuleRelCondition.Criteria criteria = condition.createCriteria();
         criteria.andGatewayInstanceIdEqualTo(gateway.getInstanceId());
@@ -131,5 +139,49 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
         }
 
 
+    }
+
+    @Override
+    @Transactional
+    public void saveRel(List<Integer> gatewayIdList, List<Integer> ruleIdList) {
+        AssertTools.notNull(gatewayIdList, "网关不能为空");
+        List<String> instanceIdList = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(gatewayIdList)) {
+            List<GatewayInstance> gatewayInstanceList = this.getGateway(gatewayIdList.toArray(new Integer[0]));
+            Map<Integer, String> gatewayIdMap = IteratorTools.toMap(gatewayInstanceList, GatewayInstance::getId, GatewayInstance::getInstanceId);
+            for (Integer gid : gatewayIdList) {
+                AssertTools.isTrue(gatewayIdMap.containsKey(gid), "不存在的网关:" + gid);
+                instanceIdList.add(gatewayIdMap.get(gid));
+            }
+        }
+
+        if (CollectionUtils.isNotEmpty(ruleIdList)) {
+            List<RouteRule> routeRuleList = routeRuleService.getRouteRuleList(ruleIdList);
+            List<Integer> routeRuleIdList = routeRuleList.stream().map(RouteRule::getId).collect(Collectors.toList());
+            for (Integer gid : ruleIdList) {
+                AssertTools.isTrue(routeRuleIdList.contains(gid), "不存在的路由规则:" + gid);
+            }
+        }
+
+        GatewayRouteRuleRelCondition relCondition = new GatewayRouteRuleRelCondition();
+        GatewayRouteRuleRelCondition.Criteria criteria = relCondition.createCriteria();
+        criteria.andGatewayInstanceIdIn(instanceIdList);
+        int num = gatewayRouteRuleRelMapper.deleteByExample(relCondition);
+        log.info("删除网关和路由规则关系:{}",num);
+
+        if (ruleIdList.size() > 0) {
+            for (String instanceId : instanceIdList) {
+                for (Integer ruleId : ruleIdList) {
+                    GatewayRouteRuleRel routeRuleRel = new GatewayRouteRuleRel();
+                    routeRuleRel.setGatewayInstanceId(instanceId);
+                    routeRuleRel.setRouteRuleId(ruleId);
+                    int i = gatewayRouteRuleRelMapper.insertSelective(routeRuleRel);
+                    AssertTools.isTrue(i == 1, "插入失败");
+                    log.info("新增网关和路由规则关系:{}",routeRuleRel);
+                }
+            }
+
+        }
+        log.info("保存路由规则:{} 和网关关系成功:{}", ruleIdList, gatewayIdList);
     }
 }

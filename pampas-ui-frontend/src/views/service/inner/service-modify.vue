@@ -1,6 +1,5 @@
 <template>
   <div class="app-container">
-
     <el-form ref="service_form" :model="service_form" size="small" :rules="rules"
              label-width="120px"
              label-position="left"
@@ -16,6 +15,34 @@
         </el-col>
       </el-row>
       <el-row>
+        <el-col :span="12">
+          <el-form-item label="服务类型"
+                        prop="remark">
+            <el-select v-model="service_form.type" placeholder="请选择">
+              <el-option
+                v-for="item in service_types"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="注册中心"
+                        prop="registry_id">
+            <el-select v-model="service_form.registry_id" placeholder="请选择">
+              <el-option
+                v-for="item in registrys"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id">
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
         <el-col :span="20">
           <el-form-item label="服务备注"
                         prop="remark">
@@ -23,13 +50,15 @@
           </el-form-item>
         </el-col>
       </el-row>
+
+
       <el-form-item>
         <el-button type="primary" @click="doSave">保存</el-button>
         <el-button v-show="service_form.id" type="" @click="doAddInstance">添加实例</el-button>
       </el-form-item>
     </el-form>
 
-    <el-tabs value="first" v-show="service_form.id" type="border-card" >
+    <el-tabs value="first" v-show="service_form.id" type="border-card">
       <el-tab-pane label="服务实例列表" name="first">
         <instance-list ref="instance_list" v-show="service_form.id" :enable_page="false" :enable_search="false"
                        :service_id="service_form.id"></instance-list>
@@ -67,6 +96,8 @@
         service_form: {
           id: undefined,
           service_name: undefined,
+          registry_id:undefined,
+          type: undefined,
           remark: undefined
         },
         rules: {
@@ -74,6 +105,20 @@
         },
         dialogFormVisible: false,
         dialogFormTitle: "",
+        service_types:[{
+          value: 'sc',
+          label: 'Spring Cloud'
+        }, {
+          value: 'dubbo',
+          label: 'Dubbo'
+        }, {
+          value: 'grpc',
+          label: 'Grpc'
+        }],
+        registrys:[{
+          id:1,
+          name:'Consul-cluster-1'
+        }]
       }
     },
     created() {

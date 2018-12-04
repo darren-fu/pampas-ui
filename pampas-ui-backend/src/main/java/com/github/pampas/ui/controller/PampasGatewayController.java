@@ -5,7 +5,9 @@ import com.github.pampas.ui.base.vo.Result;
 import com.github.pampas.ui.service.PampasGatewayService;
 import com.github.pampas.ui.vo.req.GatewayInstanceListReq;
 import com.github.pampas.ui.vo.req.GatewayInstanceSaveReq;
+import com.github.pampas.ui.vo.req.RuleRelGatewaySaveReq;
 import com.github.pampas.ui.vo.resp.GatewayInstanceResp;
+import com.github.pampas.ui.vo.resp.GatewayTreeResp;
 import com.github.pampas.ui.vo.resp.RouteRuleResp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -41,10 +43,16 @@ public class PampasGatewayController {
      * @return the gateway list
      */
     @RequestMapping(value = "/gateway/list", method = RequestMethod.POST)
-    Response<Result<GatewayInstanceResp>> getGatewayList(@RequestBody GatewayInstanceListReq req,
-                                                         @RequestParam("page_num") Integer pageNum,
-                                                         @RequestParam("page_size") Integer pageSize) {
-        return gatewayService.getGatewayList(req,pageNum,pageSize);
+    public Response<Result<GatewayInstanceResp>> getGatewayList(@RequestBody GatewayInstanceListReq req,
+                                                                @RequestParam("page_num") Integer pageNum,
+                                                                @RequestParam("page_size") Integer pageSize) {
+        return gatewayService.getGatewayList(req, pageNum, pageSize);
+    }
+
+
+    @RequestMapping(value = "/gateway/tree", method = RequestMethod.GET)
+    public Response<Result<GatewayTreeResp>> getGatewayList() {
+        return gatewayService.getGatewayTree();
     }
 
     /**
@@ -54,7 +62,7 @@ public class PampasGatewayController {
      * @return the route rule rel
      */
     @RequestMapping(value = "/gateway/get_rel_rule", method = RequestMethod.GET)
-    Response<Result<RouteRuleResp>> getRouteRuleRel(@RequestParam("id")Integer gatewayId) {
+    public Response<Result<RouteRuleResp>> getRouteRuleRel(@RequestParam("id") Integer gatewayId) {
         return gatewayService.getRouteRuleRel(gatewayId);
     }
 
@@ -65,7 +73,14 @@ public class PampasGatewayController {
      * @return the gateway instance resp
      */
     @RequestMapping(value = "/gateway/save", method = RequestMethod.GET)
-    GatewayInstanceResp save(@RequestBody GatewayInstanceSaveReq req) {
+    public GatewayInstanceResp save(@RequestBody GatewayInstanceSaveReq req) {
         return gatewayService.save(req);
     }
+
+
+    @RequestMapping(value = "/gateway/save_rel", method = RequestMethod.POST)
+    public Response saveRouteRuleRelGateway(@RequestBody RuleRelGatewaySaveReq req) {
+        return gatewayService.saveRel(req);
+    }
+
 }

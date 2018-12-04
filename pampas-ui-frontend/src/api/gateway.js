@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 
 /**
- * 获取服务信息
+ * 获取gateway
  * @param form_data
  */
 export function get_gateway(gateway_id) {
@@ -32,19 +32,30 @@ export function get_gateway_list(form_data, page_num, page_size) {
 }
 
 /**
- * 获取服务实例信息
+ * 获取网关树形结构
+ */
+export function get_gateway_tree() {
+  return request({
+    url: '/gateway/tree',
+    method: 'get',
+    params: {}
+  })
+}
+
+/**
+ * 获取关联路由规则信息
  * @param form_data
  */
 export function get_rel_rules(gateway_id) {
   return request({
     url: '/gateway/get_rel_rule',
     method: 'get',
-    params: {id: id}
+    params: {id: gateway_id}
   })
 }
 
 /**
- * 保存服务实例信息
+ * 保存
  * @param form_data
  */
 export function save_instance(form_data) {
@@ -54,3 +65,17 @@ export function save_instance(form_data) {
     data: form_data
   })
 }
+
+
+/**
+ * 保存服务路由规则
+ * @param form_data
+ */
+export function save_gateway_rule_rel(form_data) {
+  return request({
+    url: '/gateway/save_rel',
+    method: 'post',
+    data: form_data
+  })
+}
+
