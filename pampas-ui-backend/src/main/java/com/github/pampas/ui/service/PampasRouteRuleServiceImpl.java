@@ -147,6 +147,7 @@ public class PampasRouteRuleServiceImpl implements PampasRouteRuleService {
 
     @Override
     public void delete(Integer ruleId) {
+        //todo 删除前判断是否被使用
         routeRuleService.delete(ruleId);
     }
 

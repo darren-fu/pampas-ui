@@ -8,7 +8,9 @@ import lombok.Data;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Description:
@@ -59,6 +61,17 @@ public class InstanceSaveReq implements Request {
         private String key;
 
         private String value;
+
+        public static List<KeyAndVal> convertMapToKeyAndVal(Map<String,String> map){
+            List<KeyAndVal> list = new ArrayList<>();
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                KeyAndVal keyAndVal = new KeyAndVal();
+                keyAndVal.key = entry.getKey();
+                keyAndVal.value = entry.getValue();
+                list.add(keyAndVal);
+            }
+            return list;
+        }
     }
 
 }

@@ -30,6 +30,25 @@ export function get_service(id) {
   })
 }
 
+
+/**
+ * 查询注册中心上指定服务的实例列表
+ * @param form_data
+ * @param page_num
+ * @param page_size
+ */
+export function check_service_instance_list(type, service_name, registry_id) {
+  return request({
+    url: '/service/instance/list_by_registry',
+    method: 'get',
+    params: {
+      type: type,
+      service_name: service_name,
+      registry_id: registry_id
+    }
+  })
+}
+
 /**
  * 保存服务信息
  * @param form_data
@@ -39,6 +58,18 @@ export function save_service(form_data) {
     url: '/service/save',
     method: 'post',
     data: form_data
+  })
+}
+
+/**
+ * 删除服务信息
+ * @param form_data
+ */
+export function delete_service(id) {
+  return request({
+    url: '/service/delete',
+    method: 'post',
+    data: {id: id}
   })
 }
 

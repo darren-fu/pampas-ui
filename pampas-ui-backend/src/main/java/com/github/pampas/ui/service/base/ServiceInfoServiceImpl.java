@@ -1,17 +1,30 @@
 package com.github.pampas.ui.service.base;
 
 import com.github.pampas.common.tools.AssertTools;
+import com.github.pampas.common.tools.JsonTools;
 import com.github.pampas.storage.entity.ServiceCondition;
+import com.github.pampas.storage.entity.ServiceInstance;
+import com.github.pampas.storage.entity.ServiceRegistry;
 import com.github.pampas.storage.mapper.ServiceMapper;
+import com.github.pampas.ui.base.BusinessException;
+import com.github.pampas.ui.base.ServiceTypeEnum;
 import com.github.pampas.ui.base.vo.Result;
+import com.github.pampas.ui.utils.DiscoveryClientContainer;
+import com.github.pampas.ui.vo.req.InstanceSaveReq;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Description:
@@ -26,6 +39,16 @@ public class ServiceInfoServiceImpl implements ServiceInfoService {
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     private ServiceMapper serviceMapper;
+
+    @Autowired
+    @Lazy
+    private DiscoveryClientContainer discoveryClientContainer;
+
+    @Autowired
+    private ServiceRegistryService registryService;
+
+    @Autowired
+    private ServiceInstanceService serviceInstanceService;
 
     @Override
     public com.github.pampas.storage.entity.Service getService(Integer id) {
@@ -66,5 +89,78 @@ public class ServiceInfoServiceImpl implements ServiceInfoService {
         }
 
         return service;
+    }
+
+    @Override
+    public void deleteService(Integer id) {
+        AssertTools.notNull(this.getService(id), "不存在的服务:" + id);
+
+        int i = serviceMapper.deleteByPrimaryKey(id);
+        AssertTools.isTrue(i == 1, "删除失败");
+        log.info("删除服务成功");
+    }
+
+    @Override
+    public List<ServiceInstance> getListInRegistry(ServiceTypeEnum type, String service, Integer registryId) {
+        AssertTools.notNull(type, "类型不能为空");
+        AssertTools.notNull(registryId, "注册中心不能为空");
+        AssertTools.notEmpty(service, "服务名不能为空");
+
+        if (type != ServiceTypeEnum.SC) {
+            throw new BusinessException("目前只支持SpringCloud获取实例列表");
+        }
+        // Spring Cloud服务   ConsulClient
+        ServiceRegistry serviceRegistry = registryService.getServiceRegistry(registryId);
+        AssertTools.notNull(serviceRegistry, "注册中心不存在");
+        DiscoveryClient discoveryClient = discoveryClientContainer.getDiscoveryClient(serviceRegistry.getId());
+        AssertTools.notNull(discoveryClient, "不支持此注册中心查询列表:" + serviceRegistry.getAddress());
+        List<String> services = discoveryClient.getServices();
+        if (!services.contains(service)) {
+            return Collections.EMPTY_LIST;
+        }
+        List<com.github.pampas.storage.entity.ServiceInstance> instanceList = new ArrayList<>();
+        List<org.springframework.cloud.client.ServiceInstance> scInstanceList = discoveryClient.getInstances(service);
+        for (org.springframework.cloud.client.ServiceInstance scInstance : scInstanceList) {
+            com.github.pampas.storage.entity.ServiceInstance instance = new com.github.pampas.storage.entity.ServiceInstance();
+            instance.setInstanceId(scInstance.getServiceId());
+            instance.setHost(scInstance.getUri().getHost());
+            instance.setPort(scInstance.getUri().getPort());
+            instance.setProtocol(scInstance.getUri().getScheme());
+            instance.setStatus(1);
+            instance.setServiceName(service);
+            List<InstanceSaveReq.KeyAndVal> keyAndValList = InstanceSaveReq.KeyAndVal.convertMapToKeyAndVal(scInstance.getMetadata());
+            instance.setProps(JsonTools.nonNullMapper().toJson(keyAndValList));
+            instanceList.add(instance);
+        }
+
+        return instanceList;
+    }
+
+    @Override
+    @Transactional
+    public void updateInstanceInService(Integer serviceId, List<ServiceInstance> instanceList, boolean flushBeforeUpdate) {
+        com.github.pampas.storage.entity.Service service = this.getService(serviceId);
+        AssertTools.notNull(service, "不存在此服务");
+        for (ServiceInstance instance : instanceList) {
+            instance.setServiceId(service.getId());
+            instance.setServiceName(service.getServiceName());
+            instance.setProtocol(service.getProtocol());
+        }
+        //查找当前已经存在的
+        List<ServiceInstance> existInstanceList = serviceInstanceService.getServiceInstanceList(serviceId);
+        List<Integer> existIdList = existInstanceList.stream().map(ServiceInstance::getId).collect(Collectors.toList());
+
+        for (ServiceInstance serviceInstance : instanceList) {
+            ServiceInstance save = serviceInstanceService.save(serviceInstance);
+            existIdList.remove(save.getId());
+        }
+        if (flushBeforeUpdate) {
+            for (Integer existId : existIdList) {
+                //删除多余的
+                serviceInstanceService.delete(existId);
+            }
+        }
+        log.info("更新服务[{}]下的实例完成:删除:{}个,详情:{},保存:{}个,详情：{}", service.getServiceName(), existIdList.size(), existIdList, instanceList.size(), instanceList);
+
     }
 }

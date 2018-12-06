@@ -49,4 +49,8 @@ public interface ServiceInstanceService {
     ServiceInstance save(ServiceInstance serviceInstance);
 
 
+    void delete(Integer id);
+
+    Integer deleteByServiceId(Integer serviceId);
+
 }

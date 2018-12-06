@@ -4,34 +4,50 @@
              label-width="120px"
              label-position="left"
              hide-required-asterisk
-             status-icon
              @submit.native.prevent>
       <el-row>
-        <el-col :span="20">
+        <el-col :span="12">
           <el-form-item label="服务名称"
                         prop="service_name">
-            <el-input v-model="service_form.service_name"/>
+            <el-input v-model="service_form.service_name" v-show="edit_mode"/>
+            <span v-show="!edit_mode">{{service_form.service_name}}</span>
+          </el-form-item>
+        </el-col>
+        <el-col :span="11" :offset="1">
+          <el-form-item label="服务状态"
+                        prop="status">
+            <el-select v-model="service_form.status" v-show="edit_mode" placeholder="请选择">
+              <el-option label="启用" :value="1"/>
+              <el-option label="停用" :value="0"/>
+            </el-select>
+
+            <span v-show="!edit_mode">{{service_form.status == 1 ?"启用" :"停用"}}</span>
           </el-form-item>
         </el-col>
       </el-row>
       <el-row>
         <el-col :span="12">
           <el-form-item label="服务类型"
-                        prop="remark">
-            <el-select v-model="service_form.type" placeholder="请选择">
-              <el-option
-                v-for="item in service_types"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
-              </el-option>
+                        prop="type">
+            <el-select v-model="service_form.type" v-show="edit_mode" placeholder="请选择">
+              <el-option label="spring cloud" value="spring cloud"/>
+              <el-option label="dubbo" value="dubbo"/>
+              <el-option label="grpc" value="grpc"/>
             </el-select>
+            <el-select v-model="service_form.protocol" v-show="special_type" placeholder="请选择协议">
+              <el-option label="http" value="http"/>
+              <el-option label="grpc" value="grpc"/>
+              <el-option label="其他" value="其他"/>
+            </el-select>
+            <span v-show="!edit_mode">{{service_form.type}}</span>
           </el-form-item>
         </el-col>
-        <el-col :span="12">
+        <el-col :span="11" :offset="1">
           <el-form-item label="注册中心"
                         prop="registry_id">
-            <el-select v-model="service_form.registry_id" placeholder="请选择">
+            <el-select v-model="service_form.registry_id" v-show="edit_mode"
+                       clearable
+                       placeholder="请选择">
               <el-option
                 v-for="item in registrys"
                 :key="item.id"
@@ -39,22 +55,30 @@
                 :value="item.id">
               </el-option>
             </el-select>
+            <span v-show="!edit_mode">{{service_form.registry_name}}</span>
           </el-form-item>
         </el-col>
       </el-row>
       <el-row>
         <el-col :span="20">
-          <el-form-item label="服务备注"
+          <el-form-item label="服务备注" placeholder="可输入备注信息"
                         prop="remark">
-            <el-input v-model="service_form.remark"/>
+            <el-input v-model="service_form.remark" v-show="edit_mode"/>
+            <span v-show="!edit_mode">{{service_form.remark}}</span>
           </el-form-item>
         </el-col>
       </el-row>
 
-
       <el-form-item>
         <el-button type="primary" @click="doSave">保存</el-button>
-        <el-button v-show="service_form.id" type="" @click="doAddInstance">添加实例</el-button>
+        <el-button v-show="service_form.id && !service_form.registry_id " type="" @click="doAddInstance">添加实例
+        </el-button>
+        <el-button v-show="!edit_mode && service_form.id && service_form.registry_id " type=""
+                   @click="doRefreshInstance">刷新实例
+        </el-button>
+        <el-button v-show="edit_mode && service_form.id && service_form.registry_id " type="" @click="doCheckInstance">
+          查看实例
+        </el-button>
       </el-form-item>
     </el-form>
 
@@ -66,7 +90,6 @@
       <el-tab-pane label="网关列表" name="second">
         xxx
       </el-tab-pane>
-
     </el-tabs>
 
 
@@ -74,12 +97,18 @@
       <instance-edit :show.sync="dialogFormVisible" :cur_service_id="service_form.id"
                      :cur_service_name="service_form.service_name"></instance-edit>
     </el-dialog>
+    <el-dialog title="实例列表" :visible.sync="dialogListVisible" @close="doCloseListDialog">
+      <instance-list ref="instance_list" v-show="service_form.id" :enable_page="false" :enable_search="false"
+                     :service_id="service_form.id"></instance-list>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-  import {get_service, save_service} from '@/api/service'
+  import {check_service_instance_list, get_service, save_service} from '@/api/service'
   import {get_instance_in_service} from '@/api/instance'
+  import {get_registry_list} from "@/api/registry"
+
   import InstanceList from './instance-list'
   import InstanceEdit from './instance-edit'
 
@@ -87,47 +116,51 @@
     name: "service-modify",
     props: {
       id: {type: Number, default: undefined},
+      edit_mode: {type: Boolean, default: true},
     },
     components: {
       InstanceList, InstanceEdit
     },
+
     data() {
       return {
         service_form: {
           id: undefined,
           service_name: undefined,
-          registry_id:undefined,
-          type: undefined,
-          remark: undefined
+          registry_id: undefined,
+          type: "spring cloud",
+          status: 0,
+          remark: undefined,
+          registry_name: undefined
         },
         rules: {
           service_name: [{required: true, message: '必须提供服务名称'}],
+          type: [{required: true, message: '必须选择服务类型'}],
+          registry_id: [{validator: this.validRegistry, trigger: ['blur', 'change']}],
         },
         dialogFormVisible: false,
+        dialogListVisible: false,
         dialogFormTitle: "",
-        service_types:[{
-          value: 'sc',
-          label: 'Spring Cloud'
-        }, {
-          value: 'dubbo',
-          label: 'Dubbo'
-        }, {
-          value: 'grpc',
-          label: 'Grpc'
-        }],
-        registrys:[{
-          id:1,
-          name:'Consul-cluster-1'
-        }]
+        registrys: []
       }
     },
     created() {
       const id = this.$route.query.id;
-      this.doQueryService(id)
+      if (this.edit_mode) {
+        this.doGetRegistry().then(_ => {
+          this.doQueryService(id)
+        })
+      } else {
+        this.doQueryService(id)
+      }
     },
     computed: {
-      edit_mode: function () {
-        return this.id ? true : false;
+      add_mode: function () {
+        return this.id ? false : true;
+      },
+      special_type: function () {
+        let type = this.service_form.type;
+        return type && type != "spring cloud" && type != "dubbo" && type != "grpc"
       }
     },
     methods: {
@@ -148,7 +181,7 @@
         ).then(v => {
           return save_service(this.service_form)
         }).then(resp => {
-          if (!this.edit_mode) {
+          if (this.add_mode) {
             this.$store.dispatch('delView', this.$route)
             this.$router.push({path: '/service/edit', query: {id: resp.id}})
           }
@@ -166,8 +199,28 @@
         this.dialogFormVisible = true
       },
       doCloseDialog() {
-        console.log('close');
         this.$refs.instance_list.reload()
+      },
+      doCloseListDialog() {
+      },
+      doGetRegistry() {
+        return get_registry_list()
+          .then(resp => {
+            this.registrys = resp.data
+            return Promise.resolve()
+          })
+      },
+      validRegistry(rule, value, callback) {
+        if (this.service_form.type == 'dubbo' && !this.service_form.registry_id) {
+          callback(new Error('DUBBO服务需要选择注册中心'));
+        }
+        callback()
+      },
+      doRefreshInstance() {
+      },
+      doCheckInstance() {
+        this.dialogListVisible = true
+        check_service_instance_list(this.service_form.type, this.service_form.service_name, this.service_form.registry_id)
       },
     }
   }

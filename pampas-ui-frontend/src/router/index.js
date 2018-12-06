@@ -55,6 +55,7 @@ export const constantRouterMap = [
     name: 'service',
     meta: {title: '服务管理', icon: 'example'},
     children: [
+
       {
         path: 'index',
         name: 'service-index',
@@ -74,7 +75,27 @@ export const constantRouterMap = [
         component: () => import('@/views/service/service-edit'),
         meta: {title: '编辑服务', icon: 'edit'},
         hidden: true
-      }
+      },
+      {
+        path: 'registry/index',
+        name: 'registry-index',
+        component: () => import('@/views/registry/index'),
+        meta: {title: '注册中心', icon: 'list'}
+      },
+      {
+        path: 'registry/add',
+        name: 'registry-add',
+        component: () => import('@/views/registry/registry-edit'),
+        meta: {title: '添加注册中心', icon: 'list'},
+        hidden: true
+      },
+      {
+        path: 'registry/edit',
+        name: 'registry-edit',
+        component: () => import('@/views/registry/registry-edit'),
+        meta: {title: '编辑注册中心', icon: 'list'},
+        hidden: true
+      },
     ]
   },
   {

@@ -2,6 +2,7 @@ package com.github.pampas.ui.vo.req;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.github.pampas.ui.base.RegistryTypeEnum;
 import com.github.pampas.ui.base.vo.Request;
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
@@ -9,15 +10,21 @@ import lombok.Data;
 /**
  * Description:
  * User: darrenfu
- * Date: 2018-11-16
+ * Date: 2018-12-04
  */
 @Data
-@ApiModel(value = "查询服务列表请求")
+@ApiModel(value = "保存注册中心请求")
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-public class ServiceListReq implements Request {
+public class ServiceRegistrySaveReq implements Request {
 
-    private String group;
-    private String serviceName;
+    private Integer id;
 
-    private Integer registryId;
+    private String name;
+
+    private RegistryTypeEnum type;
+
+    private String address;
+
+
+    private String remark;
 }

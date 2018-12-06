@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import java.util.Date;
 
@@ -24,6 +25,18 @@ public class ServiceResp {
     private String group;
 
     private String serviceName;
+
+    // sc dubbo grpc
+    @NotEmpty(message = "服务类型不能为空")
+    private String type;
+
+    // http
+    private String protocol;
+
+    //注册中心
+    private Integer registryId;
+
+    private String registryName;
 
     private String remark;
 

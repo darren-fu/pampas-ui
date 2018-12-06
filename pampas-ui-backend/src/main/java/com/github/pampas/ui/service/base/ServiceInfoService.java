@@ -1,7 +1,11 @@
 package com.github.pampas.ui.service.base;
 
 import com.github.pampas.storage.entity.Service;
+import com.github.pampas.storage.entity.ServiceInstance;
+import com.github.pampas.ui.base.ServiceTypeEnum;
 import com.github.pampas.ui.base.vo.Result;
+
+import java.util.List;
 
 /**
  * Description:
@@ -22,11 +26,10 @@ public interface ServiceInfoService {
     /**
      * 查询服务列表
      *
-     *
      * @param serviceName
      * @param group
-     * @param pageNum  the page num
-     * @param pageSize the page size
+     * @param pageNum     the page num
+     * @param pageSize    the page size
      * @return service list
      */
     Result<Service> getServiceList(String serviceName, String group,
@@ -41,4 +44,10 @@ public interface ServiceInfoService {
      */
     Service saveService(Service service);
 
+    void deleteService(Integer id);
+
+    List<ServiceInstance> getListInRegistry(ServiceTypeEnum type, String service, Integer registryId);
+
+
+    void updateInstanceInService(Integer serviceId, List<ServiceInstance> instanceList, boolean flushBeforeUpdate);
 }
