@@ -37,6 +37,7 @@ public class InstanceSaveReq implements Request {
 
     private String hostName;
 
+    private String version;
     private String room;
 
     @NotNull(message = "服务端口不能为空")

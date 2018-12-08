@@ -22,19 +22,19 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * 服务分类枚举
+ * 注册中心模式枚举
  * Created by darrenfu on 18-4-28.
  *
  * @author: darrenfu
  * @date: 18-4-28
  */
-public enum ServiceTypeEnum {
+public enum RegistryPatternEnum {
 
-    RESTful("RESTful"), DUBBO("dubbo"), GRPC("grpc");
+    SC("spring cloud"), DUBBO("zookeeper"), GRPC("etcd");
 
     private String value;
 
-    ServiceTypeEnum(String value) {
+    RegistryPatternEnum(String value) {
         this.value = value;
     }
 
@@ -44,8 +44,8 @@ public enum ServiceTypeEnum {
     }
 
     @JsonCreator
-    public static ServiceTypeEnum getEnum(String value){
-        for (ServiceTypeEnum anEnum : values()) {
+    public static RegistryPatternEnum getEnum(String value){
+        for (RegistryPatternEnum anEnum : values()) {
             if(anEnum.getValue().equals(value)){
                 return anEnum;
             }

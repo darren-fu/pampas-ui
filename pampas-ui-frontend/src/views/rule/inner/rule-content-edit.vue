@@ -18,6 +18,7 @@
                       <el-select v-model="rule.type" style="width: 40%">
                         <el-option label="HTTP" value="http"/>
                         <el-option label="DUBBO" value="dubbo"/>
+                        <el-option label="GRPC" value="grpc"/>
                       </el-select>
                     </el-form-item>
                   </el-col>
@@ -26,7 +27,17 @@
                                   :rules="[
                           { required: true, message: '请选择路由服务', trigger: 'blur' },
                         ]">
-                      <el-input v-model="rule.service"></el-input>
+                      <el-select v-model="rule.service"
+                                 clearable
+                                 placeholder="请选择">
+                        <el-option
+                          v-for="item in services"
+                          :key="item.id"
+                          :label="item.service_name"
+                          :value="item.service_name">
+                        </el-option>
+                      </el-select>
+
                     </el-form-item>
                   </el-col>
                   <el-col :span="12">
@@ -91,6 +102,7 @@
   import Monaco from '@/components/Monaco'
   import {formatJson, isJSON, isYAML, toJSON, toYAML} from '@/utils/json'
   import {get_route_rule, save_route_rule} from '@/api/route-rule'
+  import {get_service_list} from "@/api/service"
 
 
   export default {
@@ -108,52 +120,20 @@
           id: undefined,
           rule_list: [],
         },
-        // rule_form2: {
-        //   "id": 1,
-        //   rule_list: [
-        //     {
-        //       "type": "http",
-        //       "service": "test",
-        //       "path": "/test1",
-        //       "mapping_strategy": "appoint",
-        //       "mapping_path": "/t/1",
-        //       "host_strategy": "appoint",
-        //       "mapping_host": "http://www.google.com"
-        //     },
-        //     {
-        //       "service": "test",
-        //       "type": "http",
-        //       "path": "/test/test2/*",
-        //       "mapping_strategy": "strip",
-        //       "mapping_path": "/test",
-        //       "host_strategy": "appoint",
-        //       "mapping_host": "http://www.google.com"
-        //     },
-        //     {
-        //       "service": "test",
-        //       "type": "http",
-        //       "path": "/test/test3/*",
-        //       "mapping_strategy": "strip",
-        //       "mapping_path": "/test",
-        //       "host_strategy": "auto",
-        //     },
-        //     {
-        //       "service": "duoo-service",
-        //       "type": "dubbo",
-        //       "path": "/dubbo/test3/*",
-        //     }
-        //   ]
-        // },
-
-        valid_rules: {}
+        valid_rules: {},
+        services: []
       }
     },
     created() {
-      if (this.rule_id) {
-        this.doLoad(this.rule_id)
-        this.yaml = toYAML(this.rule_form.rule_list)
-        this.json = toJSON(this.rule_form.rule_list)
-      }
+      this.doLoadServiceList()
+        .then(_=>{
+          if (this.rule_id) {
+            this.doLoad(this.rule_id)
+            this.yaml = toYAML(this.rule_form.rule_list)
+            this.json = toJSON(this.rule_form.rule_list)
+          }
+        })
+
     },
     methods: {
       doLoad(rule_id) {
@@ -161,8 +141,13 @@
           this.rule_form = resp;
         })
       },
+      doLoadServiceList() {
+        return get_service_list({}, 1, 10000).then(response => {
+          this.services = response.data
+          return Promise.resolve();
+        })
+      },
       switchTab(newTabName, oldTabName) {
-        console.log('oldTabName', oldTabName);
         if (newTabName == "save") {
           this.doSaveRules()
           return false;
@@ -230,6 +215,7 @@
       addRule() {
         let item = {
           "type": "http",
+          "host_strategy":"auto",
         };
         if (!this.rule_form.rule_list) {
           this.rule_form.rule_list = []
@@ -258,7 +244,7 @@
     color: #111110;
   }
 
-  .rule_form .el-form-item--mini.el-form-item{
+  .rule_form .el-form-item--mini.el-form-item {
     margin-bottom: 6px;
   }
 </style>

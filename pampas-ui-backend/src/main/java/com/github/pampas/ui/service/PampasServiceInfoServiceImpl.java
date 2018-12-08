@@ -81,7 +81,7 @@ public class PampasServiceInfoServiceImpl implements PampasServiceInfoService {
         Service service = BeanTools.copyBean(req, Service.class);
         service.setType(req.getType().getValue());
         service.setProtocol(ProtocolTypeEnum.HTTP.getValue());
-        if (req.getType() == ServiceTypeEnum.SC) {
+        if (req.getType() == ServiceTypeEnum.RESTful) {
             service.setProtocol(ProtocolTypeEnum.HTTP.getValue());
         } else if (req.getType() == ServiceTypeEnum.DUBBO) {
             service.setProtocol(ProtocolTypeEnum.DUBBO.getValue());
@@ -123,6 +123,7 @@ public class PampasServiceInfoServiceImpl implements PampasServiceInfoService {
     public Response<ServiceRegistryResp> saveRegistry(ServiceRegistrySaveReq req) {
         ServiceRegistry serviceRegistry = BeanTools.copyBean(req, ServiceRegistry.class);
         serviceRegistry.setType(req.getType().getValue());
+        serviceRegistry.setPattern(req.getPattern().getValue());
         ServiceRegistry newServiceRegistry = serviceRegistryService.saveServiceRegistry(serviceRegistry);
         ServiceRegistryResp serviceRegistryResp = BeanTools.copyBean(newServiceRegistry, ServiceRegistryResp.class);
         return Response.buildSuccessResponseWithInfo(serviceRegistryResp);

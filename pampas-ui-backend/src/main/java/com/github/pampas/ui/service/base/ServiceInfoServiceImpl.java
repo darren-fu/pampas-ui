@@ -106,8 +106,8 @@ public class ServiceInfoServiceImpl implements ServiceInfoService {
         AssertTools.notNull(registryId, "注册中心不能为空");
         AssertTools.notEmpty(service, "服务名不能为空");
 
-        if (type != ServiceTypeEnum.SC) {
-            throw new BusinessException("目前只支持SpringCloud获取实例列表");
+        if (type != ServiceTypeEnum.RESTful) {
+            throw new BusinessException("目前只支持RESTful服务获取实例列表");
         }
         // Spring Cloud服务   ConsulClient
         ServiceRegistry serviceRegistry = registryService.getServiceRegistry(registryId);

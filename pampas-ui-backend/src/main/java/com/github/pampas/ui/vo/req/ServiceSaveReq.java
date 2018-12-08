@@ -37,6 +37,9 @@ public class ServiceSaveReq implements Request {
 
     private String group;
 
+    @NotNull(message = "状态不能为空")
+    private Boolean status;
+
     private String remark;
 
 }

@@ -39,6 +39,7 @@
 
 <script>
   import {get_route_rule, save_route_rule} from '@/api/route-rule'
+  import {get_service_list} from "@/api/service"
 
   export default {
     name: "rule-base-edit",
@@ -53,7 +54,10 @@
           mapping_host: undefined,
           remark: undefined,
         },
-        rules: {},
+        rules: {
+          name: [{required: true, message: '必须提供名称'}],
+        },
+        services:[],
       }
     },
     created() {
@@ -68,16 +72,22 @@
         })
       },
       doSaveBaseInfo() {
-        let data = this.base_form
-        data["mode"] = 1
-        save_route_rule(data).then(resp => {
-          if(!this.rule_id ){
-            this.$store.dispatch('delView', this.$route)
-
-            this.$router.push({path: '/rule/edit', query: {id: resp.id}})
+        this.$refs.base_form.validate().then(v => {
+            return this.$confirm('确认保存？')
           }
-          // this.base_form = resp
-          // this.$emit('update:rule_id', resp.id)
+        ).then(_ => {
+          let data = this.base_form
+          data["mode"] = 1
+          save_route_rule(data).then(resp => {
+            this.$message({
+              message: '保存完成',
+              type: 'success'
+            });
+            if (!this.rule_id) {
+              this.$store.dispatch('delView', this.$route)
+              this.$router.push({path: '/rule/edit', query: {id: resp.id}})
+            }
+          })
         })
       },
     }

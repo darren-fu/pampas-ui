@@ -20,7 +20,6 @@
               <el-option label="启用" :value="1"/>
               <el-option label="停用" :value="0"/>
             </el-select>
-
             <span v-show="!edit_mode">{{service_form.status == 1 ?"启用" :"停用"}}</span>
           </el-form-item>
         </el-col>
@@ -30,7 +29,7 @@
           <el-form-item label="服务类型"
                         prop="type">
             <el-select v-model="service_form.type" v-show="edit_mode" placeholder="请选择">
-              <el-option label="spring cloud" value="spring cloud"/>
+              <el-option label="RESTful" value="RESTful"/>
               <el-option label="dubbo" value="dubbo"/>
               <el-option label="grpc" value="grpc"/>
             </el-select>
@@ -70,21 +69,23 @@
       </el-row>
 
       <el-form-item>
-        <el-button type="primary" @click="doSave">保存</el-button>
-        <el-button v-show="service_form.id && !service_form.registry_id " type="" @click="doAddInstance">添加实例
+        <el-button type="primary" v-show="edit_mode" @click="doSave">保存</el-button>
+        <el-button v-show="service_form.id  && edit_mode&& !service_form.registry_id " type="" @click="doAddInstance">
+          添加实例
         </el-button>
         <el-button v-show="!edit_mode && service_form.id && service_form.registry_id " type=""
-                   @click="doRefreshInstance">刷新实例
+                   @click="doRefreshInstance">刷新注册中心实例
         </el-button>
         <el-button v-show="edit_mode && service_form.id && service_form.registry_id " type="" @click="doCheckInstance">
-          查看实例
+          查看注册中心实例
         </el-button>
       </el-form-item>
     </el-form>
 
     <el-tabs value="first" v-show="service_form.id" type="border-card">
       <el-tab-pane label="服务实例列表" name="first">
-        <instance-list ref="instance_list" v-show="service_form.id" :enable_page="false" :enable_search="false"
+        <instance-list ref="instance_list" @edit_instance="doEditInstance" v-show="service_form.id" :enable_page="false"
+                       :enable_search="false"
                        :service_id="service_form.id"></instance-list>
       </el-tab-pane>
       <el-tab-pane label="网关列表" name="second">
@@ -94,7 +95,8 @@
 
 
     <el-dialog :title="dialogFormTitle" :visible.sync="dialogFormVisible" @close="doCloseDialog">
-      <instance-edit :show.sync="dialogFormVisible" :cur_service_id="service_form.id"
+      <instance-edit ref="instance_edit" :show.sync="dialogFormVisible" :id.sync="cur_instance_id"
+                     :cur_service_id="service_form.id"
                      :cur_service_name="service_form.service_name"></instance-edit>
     </el-dialog>
     <el-dialog title="实例列表" :visible.sync="dialogListVisible" @close="doCloseListDialog">
@@ -128,11 +130,12 @@
           id: undefined,
           service_name: undefined,
           registry_id: undefined,
-          type: "spring cloud",
+          type: "RESTful",
           status: 0,
           remark: undefined,
           registry_name: undefined
         },
+        cur_instance_id: undefined,
         rules: {
           service_name: [{required: true, message: '必须提供服务名称'}],
           type: [{required: true, message: '必须选择服务类型'}],
@@ -154,13 +157,24 @@
         this.doQueryService(id)
       }
     },
+    watch: {
+      // 如果 `question` 发生改变，这个函数就会运行
+      // cur_instance_id: function (newVal, oldVal) {
+      //   if (typeof (newVal) != 'undefined') {
+      //     this.dialogFormTitle = "编辑实例"
+      //     this.dialogFormVisible = true
+      //   } else {
+      //     this.dialogFormVisible = false
+      //   }
+      // }
+    },
     computed: {
       add_mode: function () {
         return this.id ? false : true;
       },
       special_type: function () {
         let type = this.service_form.type;
-        return type && type != "spring cloud" && type != "dubbo" && type != "grpc"
+        return type && type != "RESTful" && type != "dubbo" && type != "grpc"
       }
     },
     methods: {
@@ -197,8 +211,19 @@
       doAddInstance() {
         this.dialogFormTitle = "添加实例"
         this.dialogFormVisible = true
+        this.cur_instance_id = undefined
       },
+      doEditInstance(instance_id) {
+        this.dialogFormTitle = "修改实例"
+        this.dialogFormVisible = true
+        this.cur_instance_id = instance_id
+        if (this.$refs.instance_edit) {
+          this.$refs.instance_edit.doLoad()
+        }
+      },
+
       doCloseDialog() {
+        this.cur_instance_id = undefined
         this.$refs.instance_list.reload()
       },
       doCloseListDialog() {

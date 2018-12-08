@@ -23,6 +23,17 @@
       </el-row>
       <el-row>
         <el-col :span="24">
+          <el-form-item label="模式" prop="pattern">
+            <el-select v-model="base_form.pattern" placeholder="请选择模式">
+              <el-option label="spring cloud" value="spring cloud"/>
+              <el-option label="dubbo" value="dubbo"/>
+              <el-option label="grpc" value="grpc"/>
+            </el-select>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="24">
           <el-form-item label="地址" prop="address">
             <el-input v-model="base_form.address" placeholder="输入注册中心地址"/>
           </el-form-item>
@@ -61,12 +72,14 @@
           id: undefined,
           name: undefined,
           type: undefined,
+          pattern: undefined,
           address: undefined,
           remark: undefined,
         },
         rules: {
           name: [{required: true, message: '必须提供名称'}],
           type: [{required: true, message: '必须提供类型'}],
+          pattern: [{required: true, message: '必须提供服务发现/注册模式'}],
           address: [{required: true, message: '必须提供地址'}],
 
         },

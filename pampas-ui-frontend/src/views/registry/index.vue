@@ -36,6 +36,11 @@
         width="100">
       </el-table-column>
       <el-table-column
+        prop="pattern"
+        label="模式"
+        width="100">
+      </el-table-column>
+      <el-table-column
         prop="address"
         label="地址"
         width="300">

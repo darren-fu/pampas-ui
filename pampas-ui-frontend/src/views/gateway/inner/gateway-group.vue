@@ -1,21 +1,14 @@
 <template>
-  <div class="app-container">
+  <div>
     <el-row>
-      <el-col :span="10">
+      <el-col :span="18">
         <el-input
           placeholder="输入名称进行筛选"
           v-model="filterGatewayText">
         </el-input>
         <el-radio-group v-model="mode" size="mini" style="margin: 5px 0">
-          <el-tooltip class="item" effect="dark" content="批量模式不会删除已关联的路由规则"
-                      placement="top-start">
-            <el-radio-button label="multi">批量模式</el-radio-button>
-          </el-tooltip>
-          <el-tooltip class="item" effect="dark" content="单选模式下，取消勾选的路由规则会被删除关联关系"
-                      placement="top-start">
-            <el-radio-button label="single">单选模式</el-radio-button>
-          </el-tooltip>
-
+          <el-radio-button label="multi">批量</el-radio-button>
+          <el-radio-button label="single">单选</el-radio-button>
         </el-radio-group>
         <el-tree
           ref="gatewayTree"
@@ -32,30 +25,7 @@
           :default-expanded-keys="[]"
           :default-checked-keys="defaultCheckedIds"
           :props="defaultProps">
-        </el-tree>
-      </el-col>
-      <el-col :span="8" :offset="0">
-        <el-input
-          style="margin-left: 10px"
-          placeholder="输入名称进行筛选"
-          v-model="filterRuleText">
-        </el-input>
-        <el-tree
-          ref="ruleTree"
-          empty-text="没有符合条件的路由规则"
-          class="r_tree"
-          :data="ruleTreeData"
-          :filter-node-method="filterRuleTree"
-          :show-checkbox="showRuleCheckbox"
-          check-on-click-node
-          default-expand-all
-          :expand-on-click-node="false"
-          node-key="id"
-          :default-expanded-keys="[]"
-          :default-checked-keys="defaultCheckedIds"
-          :props="defaultProps"
-        >
-        <span class="custom-tree-node" slot-scope="{ node, data }">
+          <span class="custom-tree-node" slot-scope="{ node, data }">
         <span>{{ node.label }}</span>
         <span>
           <!--<el-tag size="mini" type="info" v-if="data.leaf && data.status">已启用</el-tag>-->
@@ -79,14 +49,12 @@
   import {get_gateway_tree, get_rel_rules, save_gateway_rule_rel} from '@/api/gateway'
 
   export default {
-    name: "gateway-rel-rule",
+    name: "gateway-group",
     data() {
       return {
         mode: 'single',
         gatewayTreeData: [],
-        ruleTreeData: [],
         filterGatewayText: '',
-        filterRuleText: '',
         defaultCheckedIds: [],
         defaultProps: {
           children: 'children',
@@ -102,9 +70,7 @@
       filterGatewayText(val) {
         this.$refs.gatewayTree.filter(val);
       },
-      filterRuleText(val) {
-        this.$refs.ruleTree.filter(val);
-      },
+
     },
     computed: {},
     methods: {
@@ -112,21 +78,13 @@
         get_gateway_tree().then(resp => {
           this.gatewayTreeData = resp.data
           return Promise.resolve();
-        }).then(_ => {
-          return get_rule_tree()
-        }).then(resp => {
-          this.ruleTreeData = resp.data
-          return Promise.resolve();
         })
       },
       filterGatewayTree(value, data) {
         if (!value) return true;
         return data.label.indexOf(value) !== -1 || (data.group && data.group.indexOf(value) !== -1);
       },
-      filterRuleTree(value, data) {
-        if (!value) return true;
-        return data.label.indexOf(value) !== -1 || (data.group && data.group.indexOf(value) !== -1);
-      },
+
       reset() {
       },
       saveRel() {
@@ -153,12 +111,10 @@
       },
       clickGatewayTreeNode(data, node, item) {
         if (this.mode == 'multi') {
-
           return
         }
         //单选模式
         console.log(data, node, item);
-
         if (node.checked) {
           this.$refs.gatewayTree.setCheckedKeys([data.id])
           get_rel_rules(data.id).then(resp => {

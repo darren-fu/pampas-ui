@@ -23,6 +23,7 @@ public class ServiceRegistryResp {
     private String name;
 
     private String type;
+    private String pattern;
 
     private String address;
 

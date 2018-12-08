@@ -89,7 +89,7 @@
 
       <el-table-column label="操作">
         <template slot-scope="scope">
-          <!--<el-button @click="doViewInfo(scope.row)" type="text" size="small">查看</el-button>-->
+          <el-button @click="doEditInfo(scope.row)" type="text" size="small">编辑</el-button>
         </template>
       </el-table-column>
 
@@ -190,8 +190,10 @@
       handleSizeChange(size) {
         this.page_size = size
         this.page_num = 1
-
         this.doLoadByForm();
+      },
+      doEditInfo(row) {
+        this.$emit('edit_instance', row.id)
       },
     }
   }

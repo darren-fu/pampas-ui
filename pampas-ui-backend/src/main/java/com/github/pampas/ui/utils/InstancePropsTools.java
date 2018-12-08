@@ -37,7 +37,7 @@ public class InstancePropsTools {
     public static void convertProJsonToKeyAndVal(ServiceInstance instance, InstanceResp instanceResp) {
         if (StringUtils.isNotEmpty(instance.getProps())) {
             try {
-                List<InstanceSaveReq.KeyAndVal> keyAndValList = JsonTools.nonNullMapper().fromJson(instance.getProps(), new TypeReference<List<InstanceSaveReq.KeyAndVal>>() {
+                List<InstanceSaveReq.KeyAndVal> keyAndValList = JsonTools.NON_NULL.fromJson(instance.getProps(), new TypeReference<List<InstanceSaveReq.KeyAndVal>>() {
                 });
                 instanceResp.setPropList(keyAndValList);
 

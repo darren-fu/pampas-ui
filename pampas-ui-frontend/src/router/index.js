@@ -77,6 +77,20 @@ export const constantRouterMap = [
         hidden: true
       },
       {
+        path: 'view',
+        name: 'service-view',
+        component: () => import('@/views/service/service-view'),
+        meta: {title: '查看服务', icon: 'edit'},
+        hidden: true
+      },
+      {
+        path: 'instance/edit',
+        name: 'instance-edit',
+        component: () => import('@/views/service/instance-view'),
+        meta: {title: '查看服务实例', icon: 'edit'},
+        hidden: true
+      },
+      {
         path: 'registry/index',
         name: 'registry-index',
         component: () => import('@/views/registry/index'),

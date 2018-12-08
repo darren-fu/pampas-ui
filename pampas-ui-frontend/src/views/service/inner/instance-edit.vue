@@ -3,6 +3,15 @@
     <el-form ref="instance_form" :model="instance_form" size="small" :rules="rules"
              label-width="120px"
              @submit.native.prevent>
+
+      <el-row v-if="specific_instance">
+        <el-col :span="24">
+          <el-form-item label="服务实例ID" >
+            <el-input v-model="instance_form.instance_id" :readonly="specific_instance"/>
+          </el-form-item>
+        </el-col>
+
+      </el-row>
       <el-row>
         <el-col :span="12">
           <el-form-item label="服务名称" prop="service_name">
@@ -156,6 +165,9 @@
       },
       specific_service: function () {
         return this.cur_service_id ? true : false
+      },
+      specific_instance: function () {
+        return this.id ? true : false
       }
     },
     watch: {
