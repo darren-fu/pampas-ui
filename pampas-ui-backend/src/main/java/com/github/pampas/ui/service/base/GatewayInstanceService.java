@@ -1,7 +1,9 @@
 package com.github.pampas.ui.service.base;
 
+import com.github.pampas.storage.entity.GatewayConfig;
 import com.github.pampas.storage.entity.GatewayInstance;
 import com.github.pampas.storage.entity.GatewayRouteRuleRel;
+import com.github.pampas.storage.entity.GatewaySpi;
 import com.github.pampas.ui.base.vo.Result;
 import com.github.pampas.ui.vo.req.GatewayInstanceListReq;
 
@@ -35,7 +37,7 @@ public interface GatewayInstanceService {
     Result<GatewayInstance> getGatewayList(GatewayInstanceListReq req, Integer pageNum, Integer pageSize);
 
     /**
-     * Gets route rule rel.
+     * 获取网关管理的路由规则列表
      *
      * @param gatewayId the gateway id
      * @return the route rule rel
@@ -43,7 +45,7 @@ public interface GatewayInstanceService {
     Result<GatewayRouteRuleRel> getRouteRuleRel(Integer gatewayId);
 
     /**
-     * Count route rule rel map.
+     * 统计网关管理路由规则数量
      *
      * @param gatewayId the gateway id
      * @return the map
@@ -65,4 +67,8 @@ public interface GatewayInstanceService {
      */
     void saveRel(List<Integer> gatewayIdList, List<Integer> ruleIdList);
 
+
+    List<GatewaySpi> getSpiList(String gatewayGroup, String gatewayInstanceId);
+
+    List<GatewayConfig> getGatewayConfigList(String gatewayGroup, String gatewayInstanceId);
 }

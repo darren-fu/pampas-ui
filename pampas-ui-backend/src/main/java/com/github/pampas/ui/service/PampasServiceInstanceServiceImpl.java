@@ -70,7 +70,7 @@ public class PampasServiceInstanceServiceImpl implements PampasServiceInstanceSe
         }
         //转换成Json 存储
         if (CollectionUtils.isNotEmpty(req.getPropList())) {
-            serviceInstance.setProps(JsonTools.nonNullMapper().toJson(req.getPropList()));
+            serviceInstance.setProps(JsonTools.NON_NULL.toJson(req.getPropList()));
         }
         ServiceInstance instance = instanceService.save(serviceInstance);
         InstanceResp instanceResp = BeanTools.copyBean(instance, InstanceResp.class);

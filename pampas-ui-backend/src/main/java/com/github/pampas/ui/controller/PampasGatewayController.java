@@ -6,9 +6,7 @@ import com.github.pampas.ui.service.PampasGatewayService;
 import com.github.pampas.ui.vo.req.GatewayInstanceListReq;
 import com.github.pampas.ui.vo.req.GatewayInstanceSaveReq;
 import com.github.pampas.ui.vo.req.RuleRelGatewaySaveReq;
-import com.github.pampas.ui.vo.resp.GatewayInstanceResp;
-import com.github.pampas.ui.vo.resp.GatewayTreeResp;
-import com.github.pampas.ui.vo.resp.RouteRuleResp;
+import com.github.pampas.ui.vo.resp.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -81,6 +79,21 @@ public class PampasGatewayController {
     @RequestMapping(value = "/gateway/save_rel", method = RequestMethod.POST)
     public Response saveRouteRuleRelGateway(@RequestBody RuleRelGatewaySaveReq req) {
         return gatewayService.saveRel(req);
+    }
+
+
+    @RequestMapping(value = "/gateway/get_config_list", method = RequestMethod.GET)
+    public Response<Result<GatewayConfigResp>> getConfigList(@RequestParam(value = "id", required = false) Integer gatewayId,
+                                                             @RequestParam(value = "group", required = false) String gatewayGroup,
+                                                             @RequestParam(value = "instance_id", required = false) String gatewayInstanceId) {
+        return gatewayService.getGatewayConfigList(gatewayId, gatewayGroup, gatewayInstanceId);
+    }
+
+    @RequestMapping(value = "/gateway/get_spi_list", method = RequestMethod.GET)
+    public Response<Result<GatewaySpiResp>> getSpiList(@RequestParam(value = "id", required = false) Integer gatewayId,
+                                                       @RequestParam(value = "group", required = false) String gatewayGroup,
+                                                       @RequestParam(value = "instance_id", required = false) String gatewayInstanceId) {
+        return gatewayService.getGatewaySpiList(gatewayId, gatewayGroup, gatewayInstanceId);
     }
 
 }

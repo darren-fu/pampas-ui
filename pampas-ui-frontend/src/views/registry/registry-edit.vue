@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="app-container">
     <el-form ref="base_form" :model="base_form" :rules="rules"
              label-width="120px"
              @submit.native.prevent>

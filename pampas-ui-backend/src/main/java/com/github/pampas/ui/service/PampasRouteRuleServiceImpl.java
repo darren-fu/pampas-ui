@@ -47,7 +47,7 @@ public class PampasRouteRuleServiceImpl implements PampasRouteRuleService {
         RouteRule routeRule = routeRuleService.getRouteRule(ruleId);
         RouteRuleResp routeRuleResp = BeanTools.copyBean(routeRule, RouteRuleResp.class);
         if (StringUtils.isNotEmpty(routeRule.getContent())) {
-            List<Map> list = JsonTools.nonNullMapper().fromJson(routeRule.getContent(), new TypeReference<List<Map>>() {
+            List<Map> list = JsonTools.NON_NULL.fromJson(routeRule.getContent(), new TypeReference<List<Map>>() {
             });
             routeRuleResp.setRuleList(list);
         }
@@ -107,7 +107,7 @@ public class PampasRouteRuleServiceImpl implements PampasRouteRuleService {
         } else if (saveReq.getMode() == 2) {
             AssertTools.notNull(saveReq.getId(), "请先保存规则基本信息");
             List<AbstractRule> ruleList = new ArrayList<>(saveReq.getRuleList().size());
-            JsonTools jsonTools = JsonTools.nonNullMapper();
+            JsonTools jsonTools = JsonTools.NON_NULL;
             // 格式化规则详情
             if (saveReq.getRuleList() != null && saveReq.getRuleList().size() > 0) {
                 for (Map<String, String> ruleMap : saveReq.getRuleList()) {

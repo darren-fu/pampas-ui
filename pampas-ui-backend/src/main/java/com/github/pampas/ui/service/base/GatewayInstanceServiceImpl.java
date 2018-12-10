@@ -2,8 +2,10 @@ package com.github.pampas.ui.service.base;
 
 import com.github.pampas.common.tools.AssertTools;
 import com.github.pampas.storage.entity.*;
+import com.github.pampas.storage.mapper.GatewayConfigMapper;
 import com.github.pampas.storage.mapper.GatewayInstanceMapper;
 import com.github.pampas.storage.mapper.GatewayRouteRuleRelMapper;
+import com.github.pampas.storage.mapper.GatewaySpiMapper;
 import com.github.pampas.ui.base.vo.Result;
 import com.github.pampas.ui.utils.IteratorTools;
 import com.github.pampas.ui.vo.req.GatewayInstanceListReq;
@@ -37,6 +39,13 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
 
     @Autowired
     private RouteRuleService routeRuleService;
+
+    @Autowired
+    private GatewaySpiMapper gatewaySpiMapper;
+
+    @Autowired
+    private GatewayConfigMapper gatewayConfigMapper;
+
 
     @Override
     public List<GatewayInstance> getGateway(Integer... gatewayId) {
@@ -167,7 +176,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
         GatewayRouteRuleRelCondition.Criteria criteria = relCondition.createCriteria();
         criteria.andGatewayInstanceIdIn(instanceIdList);
         int num = gatewayRouteRuleRelMapper.deleteByExample(relCondition);
-        log.info("删除网关和路由规则关系:{}",num);
+        log.info("删除网关和路由规则关系:{}", num);
 
         if (ruleIdList.size() > 0) {
             for (String instanceId : instanceIdList) {
@@ -177,11 +186,41 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
                     routeRuleRel.setRouteRuleId(ruleId);
                     int i = gatewayRouteRuleRelMapper.insertSelective(routeRuleRel);
                     AssertTools.isTrue(i == 1, "插入失败");
-                    log.info("新增网关和路由规则关系:{}",routeRuleRel);
+                    log.info("新增网关和路由规则关系:{}", routeRuleRel);
                 }
             }
 
         }
         log.info("保存路由规则:{} 和网关关系成功:{}", ruleIdList, gatewayIdList);
+    }
+
+    @Override
+    public List<GatewaySpi> getSpiList(String gatewayGroup, String gatewayInstanceId) {
+        GatewaySpiCondition condition = new GatewaySpiCondition();
+        GatewaySpiCondition.Criteria criteria = condition.createCriteria();
+        if (StringUtils.isNotEmpty(gatewayGroup)) {
+            criteria.andGatewayGroupEqualTo(gatewayGroup);
+        }
+        if (StringUtils.isNotEmpty(gatewayInstanceId)) {
+            criteria.andGatewayInstanceIdEqualTo(gatewayInstanceId);
+        }
+        List<GatewaySpi> gatewaySpiList = gatewaySpiMapper.selectByExample(condition);
+        log.info("获取网关SPI列表:{}", gatewaySpiList);
+        return gatewaySpiList;
+    }
+
+    @Override
+    public List<GatewayConfig> getGatewayConfigList(String gatewayGroup, String gatewayInstanceId) {
+        GatewayConfigCondition configCondition = new GatewayConfigCondition();
+        GatewayConfigCondition.Criteria criteria = configCondition.createCriteria();
+        if (StringUtils.isNotEmpty(gatewayGroup)) {
+            criteria.andGatewayGroupEqualTo(gatewayGroup);
+        }
+        if (StringUtils.isNotEmpty(gatewayInstanceId)) {
+            criteria.andGatewayInstanceIdEqualTo(gatewayInstanceId);
+        }
+        List<GatewayConfig> gatewayConfigList = gatewayConfigMapper.selectByExample(configCondition);
+        log.info("查询获取当前网关配置项{}条:{}", gatewayConfigList.size(), gatewayConfigList);
+        return gatewayConfigList;
     }
 }

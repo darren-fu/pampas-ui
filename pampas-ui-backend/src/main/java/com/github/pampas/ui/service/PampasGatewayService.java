@@ -6,11 +6,7 @@ import com.github.pampas.ui.base.vo.Result;
 import com.github.pampas.ui.vo.req.GatewayInstanceListReq;
 import com.github.pampas.ui.vo.req.GatewayInstanceSaveReq;
 import com.github.pampas.ui.vo.req.RuleRelGatewaySaveReq;
-import com.github.pampas.ui.vo.resp.GatewayInstanceResp;
-import com.github.pampas.ui.vo.resp.GatewayTreeResp;
-import com.github.pampas.ui.vo.resp.RouteRuleResp;
-
-import java.util.List;
+import com.github.pampas.ui.vo.resp.*;
 
 /**
  * Description:
@@ -69,4 +65,10 @@ public interface PampasGatewayService extends IngressService {
      * @return the gateway tree
      */
     Response<Result<GatewayTreeResp>> getGatewayTree();
+
+    Response<Result<GatewayConfigResp>> getGatewayConfigList(Integer gatewayId,String gatewayGroup, String gatewayInstanceId);
+
+    Response<Result<GatewaySpiResp>> getGatewaySpiList(Integer gatewayId,String gatewayGroup, String gatewayInstanceId);
+
+
 }

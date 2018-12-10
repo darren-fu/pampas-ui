@@ -1,35 +1,34 @@
 <template>
   <div>
     <el-row>
-      <el-col :span="18">
+      <el-col :span=16>
         <el-input
           placeholder="输入名称进行筛选"
           v-model="filterGatewayText">
         </el-input>
-        <el-radio-group v-model="mode" size="mini" style="margin: 5px 0">
-          <el-radio-button label="multi">批量</el-radio-button>
-          <el-radio-button label="single">单选</el-radio-button>
-        </el-radio-group>
+        <!--show-checkbox-->
+        <!--default-expand-all-->
+
         <el-tree
           ref="gatewayTree"
           empty-text="没有可配置的网关"
           :filter-node-method="filterGatewayTree"
           @node-click="clickGatewayTreeNode"
+          icon-class="el-icon-rank"
           class="r_tree"
           :data="gatewayTreeData"
-          show-checkbox
           check-on-click-node
-          default-expand-all
-          :expand-on-click-node="false"
+          highlight-current
+          :expand-on-click-node="true"
           node-key="id"
-          :default-expanded-keys="[]"
+          :default-expanded-keys="[-1]"
           :default-checked-keys="defaultCheckedIds"
           :props="defaultProps">
           <span class="custom-tree-node" slot-scope="{ node, data }">
         <span>{{ node.label }}</span>
         <span>
-          <!--<el-tag size="mini" type="info" v-if="data.leaf && data.status">已启用</el-tag>-->
-          <el-tag size="mini" type="danger" v-if="data.leaf && !data.status">未启用</el-tag>
+          <el-tag size="mini" type="info" >刷新配置</el-tag>
+          <el-tag size="mini" type="danger" >修改自定义配置</el-tag>
         </span>
       </span>
         </el-tree>

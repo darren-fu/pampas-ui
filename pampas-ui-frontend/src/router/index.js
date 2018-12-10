@@ -154,10 +154,17 @@ export const constantRouterMap = [
       meta: {title: '网关列表', icon: 'list'},
     },
       {
-        path: 'add',
+        path: 'rel-rul',
         name: 'gateway-rel-rule',
         component: () => import('@/views/gateway/gateway-rel-rule'),
         meta: {title: '关联路由', icon: 'drag'},
+      },
+      {
+        path: 'view',
+        name: 'gateway-view',
+        component: () => import('@/views/gateway/gateway-view'),
+        meta: {title: '网关详情', icon: 'form'},
+        hidden: true
       }]
   },
   {path: '*', redirect: '/404', hidden: true}

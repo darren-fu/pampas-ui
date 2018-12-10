@@ -77,14 +77,14 @@
       <el-table-column
         prop=""
         label=""/>
-      <!--<el-table-column-->
-      <!--fixed="right"-->
-      <!--label="操作"-->
-      <!--width="120">-->
-      <!--<template slot-scope="scope">-->
-      <!--<el-button @click="doViewInfo(scope.row)" type="text" size="small"></el-button>-->
-      <!--</template>-->
-      <!--</el-table-column>-->
+      <el-table-column
+      fixed="right"
+      label="操作"
+      width="120">
+      <template slot-scope="scope">
+      <el-button @click="doViewInfo(scope.row)" type="text" size="small">查看</el-button>
+      </template>
+      </el-table-column>
     </el-table>
     <div class="pagination-container">
       <el-pagination
@@ -156,7 +156,7 @@
         this.doQuery();
       },
       doViewInfo(row) {
-        this.$router.push({path: '/rule/edit', query: {id: row.id}})
+        this.$router.push({path: '/gateway/view', query: {id: row.id}})
       },
     }
   }

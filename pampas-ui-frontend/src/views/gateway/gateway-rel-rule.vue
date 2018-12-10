@@ -7,12 +7,10 @@
           v-model="filterGatewayText">
         </el-input>
         <el-radio-group v-model="mode" size="mini" style="margin: 5px 0">
-          <el-tooltip class="item" effect="dark" content="批量模式不会删除已关联的路由规则"
-                      placement="top-start">
+          <el-tooltip effect="dark" content="批量模式不会删除已关联的路由规则" placement="top-start">
             <el-radio-button label="multi">批量模式</el-radio-button>
           </el-tooltip>
-          <el-tooltip class="item" effect="dark" content="单选模式下，取消勾选的路由规则会被删除关联关系"
-                      placement="top-start">
+          <el-tooltip effect="dark" content="单选模式下，取消勾选的路由规则会被删除关联关系" placement="top-start">
             <el-radio-button label="single">单选模式</el-radio-button>
           </el-tooltip>
 
@@ -26,11 +24,10 @@
           :data="gatewayTreeData"
           show-checkbox
           check-on-click-node
-          default-expand-all
           :expand-on-click-node="false"
           node-key="id"
-          :default-expanded-keys="[]"
-          :default-checked-keys="defaultCheckedIds"
+          :default-expanded-keys="defaultGatewayExpandIds"
+          :default-checked-keys="defaultGatewayCheckedIds"
           :props="defaultProps">
         </el-tree>
       </el-col>
@@ -48,11 +45,10 @@
           :filter-node-method="filterRuleTree"
           :show-checkbox="showRuleCheckbox"
           check-on-click-node
-          default-expand-all
           :expand-on-click-node="false"
           node-key="id"
-          :default-expanded-keys="[]"
-          :default-checked-keys="defaultCheckedIds"
+          :default-expanded-keys="defaultRuleExpandIds"
+          :default-checked-keys="defaultRuleCheckedIds"
           :props="defaultProps"
         >
         <span class="custom-tree-node" slot-scope="{ node, data }">
@@ -75,7 +71,7 @@
 </template>
 
 <script>
-  import {get_route_rule_rel, get_rule_list, get_rule_tree, save_route_rule_rel} from '@/api/route-rule'
+  import {get_rule_tree} from '@/api/route-rule'
   import {get_gateway_tree, get_rel_rules, save_gateway_rule_rel} from '@/api/gateway'
 
   export default {
@@ -87,7 +83,10 @@
         ruleTreeData: [],
         filterGatewayText: '',
         filterRuleText: '',
-        defaultCheckedIds: [],
+        defaultGatewayCheckedIds: [],
+        defaultGatewayExpandIds: [],
+        defaultRuleCheckedIds: [],
+        defaultRuleExpandIds: [],
         defaultProps: {
           children: 'children',
           label: 'label'
@@ -96,7 +95,14 @@
       };
     },
     created() {
-      this.loadTree();
+      if (this.$route.query.g_id) {
+        this.defaultGatewayCheckedIds.push(Number(this.$route.query.g_id))
+        this.defaultGatewayExpandIds.push(Number(this.$route.query.g_id))
+      }
+      this.loadTree().then(_ => {
+        this.do_check_rel_rule(this.$route.query.g_id)
+      })
+
     },
     watch: {
       filterGatewayText(val) {
@@ -109,7 +115,7 @@
     computed: {},
     methods: {
       loadTree() {
-        get_gateway_tree().then(resp => {
+        return get_gateway_tree().then(resp => {
           this.gatewayTreeData = resp.data
           return Promise.resolve();
         }).then(_ => {
@@ -153,26 +159,26 @@
       },
       clickGatewayTreeNode(data, node, item) {
         if (this.mode == 'multi') {
-
           return
         }
         //单选模式
-        console.log(data, node, item);
-
         if (node.checked) {
           this.$refs.gatewayTree.setCheckedKeys([data.id])
-          get_rel_rules(data.id).then(resp => {
-            let ids = resp.data.map(v => {
-              return v.id;
-            })
-            this.$refs.ruleTree.setCheckedKeys(ids || [])
-          })
+          this.do_check_rel_rule(data.id)
         } else {
           this.$refs.gatewayTree.setCheckedKeys([])
           this.$refs.ruleTree.setCheckedKeys([])
 
         }
-
+      },
+      do_check_rel_rule(gateway_id) {
+        get_rel_rules(gateway_id).then(resp => {
+          let ids = resp.data.map(v => {
+            return v.id;
+          })
+          this.$refs.ruleTree.setCheckedKeys(ids || [])
+          this.defaultRuleExpandIds = ids
+        })
       },
     }
   }

@@ -129,7 +129,7 @@ public class ServiceInfoServiceImpl implements ServiceInfoService {
             instance.setStatus(1);
             instance.setServiceName(service);
             List<InstanceSaveReq.KeyAndVal> keyAndValList = InstanceSaveReq.KeyAndVal.convertMapToKeyAndVal(scInstance.getMetadata());
-            instance.setProps(JsonTools.nonNullMapper().toJson(keyAndValList));
+            instance.setProps(JsonTools.NON_NULL.toJson(keyAndValList));
             instanceList.add(instance);
         }
 

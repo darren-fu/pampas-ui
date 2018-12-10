@@ -1,8 +1,7 @@
 package com.github.pampas.ui.service;
 
-import com.github.pampas.storage.entity.GatewayInstance;
-import com.github.pampas.storage.entity.GatewayRouteRuleRel;
-import com.github.pampas.storage.entity.RouteRule;
+import com.github.pampas.common.tools.AssertTools;
+import com.github.pampas.storage.entity.*;
 import com.github.pampas.ui.base.vo.Response;
 import com.github.pampas.ui.base.vo.Result;
 import com.github.pampas.ui.service.base.GatewayInstanceService;
@@ -11,9 +10,7 @@ import com.github.pampas.ui.utils.BeanTools;
 import com.github.pampas.ui.vo.req.GatewayInstanceListReq;
 import com.github.pampas.ui.vo.req.GatewayInstanceSaveReq;
 import com.github.pampas.ui.vo.req.RuleRelGatewaySaveReq;
-import com.github.pampas.ui.vo.resp.GatewayInstanceResp;
-import com.github.pampas.ui.vo.resp.GatewayTreeResp;
-import com.github.pampas.ui.vo.resp.RouteRuleResp;
+import com.github.pampas.ui.vo.resp.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,6 +26,7 @@ import java.util.stream.Collectors;
  * User: darrenfu
  * Date: 2018-11-30
  */
+@SuppressWarnings("Duplicates")
 @Service
 public class PampasGatewayServiceImpl implements PampasGatewayService {
 
@@ -90,11 +88,11 @@ public class PampasGatewayServiceImpl implements PampasGatewayService {
         if (gatewayListResult.getCount() == 0) {
             return Response.buildSuccessEmptyResponse();
         }
-        int groupId = -1;
+        int groupId = 0;
 
-        Map<String, List<GatewayInstance>> gatetayListMap = gatewayListResult.getData().stream().collect(Collectors.groupingBy(GatewayInstance::getGroup));
+        Map<String, List<GatewayInstance>> gatewayListMap = gatewayListResult.getData().stream().collect(Collectors.groupingBy(GatewayInstance::getGroup));
         List<GatewayTreeResp> gatewayTreeRespList = new ArrayList<>();
-        for (Map.Entry<String, List<GatewayInstance>> entry : gatetayListMap.entrySet()) {
+        for (Map.Entry<String, List<GatewayInstance>> entry : gatewayListMap.entrySet()) {
             GatewayTreeResp gatewayTreeResp = new GatewayTreeResp();
             gatewayTreeResp.setId(--groupId);
             gatewayTreeResp.setLabel("分组：" + entry.getKey());
@@ -110,5 +108,32 @@ public class PampasGatewayServiceImpl implements PampasGatewayService {
             gatewayTreeRespList.add(gatewayTreeResp);
         }
         return Response.buildSuccessResponseWithResult(gatewayTreeRespList, gatewayTreeRespList.size());
+    }
+
+    @Override
+    public Response<Result<GatewayConfigResp>> getGatewayConfigList(Integer gatewayId, String gatewayGroup, String gatewayInstanceId) {
+        if (gatewayId != null) {
+            List<GatewayInstance> gateway = gatewayInstanceService.getGateway(gatewayId);
+            AssertTools.notEmpty(gateway, "不存在此网关:" + gatewayId);
+            gatewayGroup = gateway.get(0).getGroup();
+        }
+        AssertTools.notEmpty(gatewayGroup, "网关分组不能为空");
+        List<GatewayConfig> gatewayConfigList = gatewayInstanceService.getGatewayConfigList(gatewayGroup, gatewayInstanceId);
+        List<GatewayConfigResp> gatewayConfigResps = BeanTools.copyBeans(gatewayConfigList, GatewayConfigResp.class);
+        return Response.buildSuccessResponseWithResult(gatewayConfigResps, gatewayConfigResps.size());
+    }
+
+    @Override
+    public Response<Result<GatewaySpiResp>> getGatewaySpiList(Integer gatewayId, String gatewayGroup, String gatewayInstanceId) {
+        if (gatewayId != null) {
+            List<GatewayInstance> gateway = gatewayInstanceService.getGateway(gatewayId);
+            AssertTools.notEmpty(gateway, "不存在此网关:" + gatewayId);
+            gatewayGroup = gateway.get(0).getGroup();
+            gatewayInstanceId = gateway.get(0).getInstanceId();
+        }
+        AssertTools.notEmpty(gatewayGroup, "网关分组不能为空");
+        List<GatewaySpi> spiList = gatewayInstanceService.getSpiList(gatewayGroup, gatewayInstanceId);
+        List<GatewaySpiResp> spiResps = BeanTools.copyBeans(spiList, GatewaySpiResp.class);
+        return Response.buildSuccessResponseWithResult(spiResps, spiResps.size());
     }
 }
