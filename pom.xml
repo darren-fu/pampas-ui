@@ -11,7 +11,11 @@
         <module>pampas-ui-frontend</module>
         <module>pampas-ui-backend</module>
     </modules>
-
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>1.5.14.RELEASE</version>
+    </parent>
     <properties>
         <main.basedir>${project.basedir}</main.basedir>
     </properties>
