@@ -219,6 +219,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
         if (StringUtils.isNotEmpty(gatewayInstanceId)) {
             criteria.andGatewayInstanceIdEqualTo(gatewayInstanceId);
         }
+        configCondition.orderBy("config_spi_interface, config_spi_class");
         List<GatewayConfig> gatewayConfigList = gatewayConfigMapper.selectByExample(configCondition);
         log.info("查询获取当前网关配置项{}条:{}", gatewayConfigList.size(), gatewayConfigList);
         return gatewayConfigList;

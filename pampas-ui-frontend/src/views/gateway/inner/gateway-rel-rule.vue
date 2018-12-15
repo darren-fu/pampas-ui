@@ -1,39 +1,48 @@
 <template>
-  <el-table
-    v-loading="listLoading"
-    :data="tableData"
-    size="medium"
-    header-row-class-name="tb_header"
-    stripe
-    style="width: 100%;margin-top: 10px">
-    <el-table-column
-      prop="id"
-      label="路由规则id"/>
+  <div>
+    <el-row v-if="tableData.length == 0">
+      <el-col :span="24">
+        <el-card :body-style="{ padding: '10px','text-align': 'center'}" style="margin: 10px">
+          <el-button type="" icon="el-icon-plus" @click="doRelRule">关联路由规则</el-button>
+        </el-card>
+      </el-col>
+    </el-row>
 
-    <el-table-column
-      prop="name"
-      label="路由规则"/>
+    <el-table v-if="tableData.length > 0"
+              v-loading="listLoading"
+              :data="tableData"
+              size="medium"
+              header-row-class-name="tb_header"
+              stripe
+              style="width: 100%;margin-top: 10px">
+      <el-table-column
+        prop="id"
+        label="路由规则id"/>
 
-    <el-table-column
-      prop="mapping_host"
-      label="匹配HOST"/>
-    <el-table-column
-      prop="mapping_host"
-      label="匹配HOST"/>
-    <el-table-column
-      prop="remark"
-      label="备注"/>
+      <el-table-column
+        prop="name"
+        label="路由规则"/>
 
+      <el-table-column
+        prop="mapping_host"
+        label="匹配HOST"/>
+      <el-table-column
+        prop="mapping_host"
+        label="匹配HOST"/>
+      <el-table-column
+        prop="remark"
+        label="备注"/>
 
-    <el-table-column
-      label="操作"
-      width="140">
-      <template slot-scope="scope">
-        <el-button @click="doViewRule(scope.row)" type="text" size="small">查看规则</el-button>
-        <el-button @click="doEditConfig(scope.row)" type="text" size="small">关联规则</el-button>
-      </template>
-    </el-table-column>
-  </el-table>
+      <el-table-column
+        label="操作"
+        width="140">
+        <template slot-scope="scope">
+          <el-button @click="doViewRule(scope.row)" type="text" size="small">查看规则</el-button>
+          <el-button @click="doEditConfig(scope.row)" type="text" size="small">关联规则</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+  </div>
 </template>
 
 <script>
@@ -69,6 +78,9 @@
       doViewRule(row) {
         this.$router.push({path: '/rule/edit', query: {id: row.id}})
 
+      },
+      doRelRule() {
+        this.$router.push({path: '/gateway/rel-rul', query: {g_id: this.gateway_id}})
       },
 
     }

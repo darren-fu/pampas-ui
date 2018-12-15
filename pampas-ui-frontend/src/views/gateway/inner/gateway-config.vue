@@ -4,22 +4,23 @@
     :data="tableData"
     size="medium"
     header-row-class-name="tb_header"
+    :span-method="objectSpanMethod"
     stripe
     style="width: 100%;margin-top: 10px">
-    <el-table-column
-      prop="id"
-      label="ID"
-      width="60">
-    </el-table-column>
-    <el-table-column
-      prop="gateway_group"
-      label="分组"
-      width="120">
-    </el-table-column>
     <!--<el-table-column-->
-      <!--prop="gateway_instance_id"-->
-      <!--label="网关编号"-->
+      <!--prop="id"-->
+      <!--label="ID"-->
+      <!--width="60">-->
+    <!--</el-table-column>-->
+    <!--<el-table-column-->
+      <!--prop="gateway_group"-->
+      <!--label="分组"-->
       <!--width="120">-->
+    <!--</el-table-column>-->
+    <!--<el-table-column-->
+    <!--prop="gateway_instance_id"-->
+    <!--label="网关编号"-->
+    <!--width="120">-->
     <!--</el-table-column>-->
 
     <el-table-column
@@ -50,6 +51,7 @@
         <el-button @click="doEditConfig(scope.row)" type="text" size="small">修改</el-button>
       </template>
     </el-table-column>
+
   </el-table>
 </template>
 
@@ -85,6 +87,24 @@
           message: '暂未实现',
           type: 'warning'
         });
+      },
+      objectSpanMethod({row, column, rowIndex, columnIndex}) {
+        if (columnIndex == 0|| columnIndex == 4) {
+          if (row.row_span != null) {
+            console.log(row, column, rowIndex, columnIndex);
+            return {
+              rowspan: row.row_span,
+              colspan: 1
+            }
+          } else {
+            return {
+              rowspan: 0,
+              colspan: 0
+            }
+          }
+
+        }
+
       },
 
     }

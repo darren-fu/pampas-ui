@@ -32,6 +32,8 @@ public class ServiceSaveReq implements Request {
     // http
     private String protocol;
 
+    private String loadbalancer;
+
     //注册中心
     private Integer registryId;
 

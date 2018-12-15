@@ -1,6 +1,7 @@
 package com.github.pampas.ui.service;
 
 import com.github.pampas.common.tools.AssertTools;
+import com.github.pampas.storage.entity.GatewaySpi;
 import com.github.pampas.storage.entity.Service;
 import com.github.pampas.storage.entity.ServiceInstance;
 import com.github.pampas.storage.entity.ServiceRegistry;
@@ -8,6 +9,7 @@ import com.github.pampas.ui.base.ProtocolTypeEnum;
 import com.github.pampas.ui.base.ServiceTypeEnum;
 import com.github.pampas.ui.base.vo.Response;
 import com.github.pampas.ui.base.vo.Result;
+import com.github.pampas.ui.service.base.GatewaySpiService;
 import com.github.pampas.ui.service.base.ServiceInfoService;
 import com.github.pampas.ui.service.base.ServiceInstanceService;
 import com.github.pampas.ui.service.base.ServiceRegistryService;
@@ -23,6 +25,7 @@ import com.github.pampas.ui.vo.resp.ServiceRegistryResp;
 import com.github.pampas.ui.vo.resp.ServiceResp;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -50,6 +53,9 @@ public class PampasServiceInfoServiceImpl implements PampasServiceInfoService {
     @Autowired
     private DiscoveryClientContainer discoveryClientContainer;
 
+    @Autowired
+    private GatewaySpiService gatewaySpiService;
+
     @Override
     public Response<ServiceResp> getService(Integer id) {
         Service service = serviceInfoService.getService(id);
@@ -58,6 +64,10 @@ public class PampasServiceInfoServiceImpl implements PampasServiceInfoService {
         if (service != null && service.getRegistryId() != null) {
             ServiceRegistry serviceRegistry = serviceRegistryService.getServiceRegistry(service.getRegistryId());
             serviceResp.setRegistryName(serviceRegistry == null ? null : serviceRegistry.getName());
+        }
+        if (StringUtils.isNotEmpty(service.getLoadbalancer())) {
+            GatewaySpi spiByName = gatewaySpiService.getSpiByName(service.getLoadbalancer());
+            serviceResp.setLoadbalancerName(spiByName == null ? null : spiByName.getSpiDesc());
         }
         return Response.buildSuccessResponseWithInfo(serviceResp);
     }

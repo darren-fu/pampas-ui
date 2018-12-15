@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-card class="box-card" shadow="hover" :body-style="{ padding: '8px' }">
+    <el-card style=" border-radius: 0px;" shadow="hover" :body-style="{ padding: '8px' }">
       <el-form ref="base_form" :model="base_form"
                label-width="120px" size="mini"
                @submit.native.prevent>

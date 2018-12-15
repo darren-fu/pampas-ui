@@ -1,6 +1,7 @@
 package com.github.pampas.ui.service;
 
 import com.github.pampas.common.tools.AssertTools;
+import com.github.pampas.common.tools.StreamTools;
 import com.github.pampas.storage.entity.*;
 import com.github.pampas.ui.base.vo.Response;
 import com.github.pampas.ui.base.vo.Result;
@@ -15,10 +16,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -120,6 +118,18 @@ public class PampasGatewayServiceImpl implements PampasGatewayService {
         AssertTools.notEmpty(gatewayGroup, "网关分组不能为空");
         List<GatewayConfig> gatewayConfigList = gatewayInstanceService.getGatewayConfigList(gatewayGroup, gatewayInstanceId);
         List<GatewayConfigResp> gatewayConfigResps = BeanTools.copyBeans(gatewayConfigList, GatewayConfigResp.class);
+
+        Map<String, List<GatewayConfigResp>> listMap = StreamTools.groupBy(gatewayConfigResps, GatewayConfigResp::getConfigSpiClass);
+        Map cache = new HashMap();
+        for (GatewayConfigResp configResp : gatewayConfigResps) {
+            List<GatewayConfigResp> list = listMap.get(configResp.getConfigSpiClass());
+            cache.computeIfAbsent(configResp.getConfigSpiClass(), v -> {
+                configResp.setRowSpan(list.size());
+                return 1;
+            });
+        }
+        cache.clear();
+
         return Response.buildSuccessResponseWithResult(gatewayConfigResps, gatewayConfigResps.size());
     }
 

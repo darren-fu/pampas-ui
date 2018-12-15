@@ -11,34 +11,37 @@
       label="ID"
       width="60">
     </el-table-column>
-    <el-table-column
-      prop="gateway_group"
-      label="分组"
-      width="120">
-    </el-table-column>
+    <!--<el-table-column-->
+    <!--prop="gateway_group"-->
+    <!--label="分组"-->
+    <!--width="120">-->
+    <!--</el-table-column>-->
     <!--<el-table-column-->
     <!--prop="gateway_instance_id"-->
     <!--label="网关编号"-->
     <!--width="120">-->
     <!--</el-table-column>-->
     <el-table-column
-      prop="spi_interface"
-      label="SPI接口"/>
+      prop="spi_interface_desc"
+      label="SPI定义"/>
     <el-table-column
       prop="spi_class"
-      label="SPI类"/>
+      label="SPI实现类"/>
     <el-table-column
       prop="spi_name"
-      label="SPI名称"/>
+      label="SPI实现名称"/>
 
     <el-table-column
       prop="spi_desc"
-      label="描述"/>
+      label="SPI实现描述"/>
     <el-table-column
       prop="status"
       label="状态"
       width="70px"
     >
+      <template slot-scope="scope">
+        <span style="">{{ scope.row.status?'正常':'停用' }}</span>
+      </template>
     </el-table-column>
 
 

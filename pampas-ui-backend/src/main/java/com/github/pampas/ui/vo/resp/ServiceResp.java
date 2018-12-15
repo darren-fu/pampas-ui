@@ -40,6 +40,11 @@ public class ServiceResp {
 
     private String remark;
 
+    private Boolean status;
+
+    private String loadbalancer;
+    private String loadbalancerName;
+
     private Date insertTime;
 
     private Date updateTime;

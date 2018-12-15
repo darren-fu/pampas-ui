@@ -17,8 +17,8 @@
           <el-form-item label="服务状态"
                         prop="status">
             <el-select v-model="service_form.status" v-show="edit_mode" placeholder="请选择">
-              <el-option label="启用" :value="1"/>
-              <el-option label="停用" :value="0"/>
+              <el-option label="启用" :value="true"/>
+              <el-option label="停用" :value="false"/>
             </el-select>
             <span v-show="!edit_mode">{{service_form.status == 1 ?"启用" :"停用"}}</span>
           </el-form-item>
@@ -55,6 +55,24 @@
               </el-option>
             </el-select>
             <span v-show="!edit_mode">{{service_form.registry_name}}</span>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="11">
+          <el-form-item label="负载均衡"
+                        prop="registry_id">
+            <el-select v-model="service_form.loadbalancer" v-show="edit_mode"
+                       clearable
+                       placeholder="请选择">
+              <el-option
+                v-for="item in loadbalancers"
+                :key="item.spi_name"
+                :label="item.spi_desc"
+                :value="item.spi_name">
+              </el-option>
+            </el-select>
+            <span v-show="!edit_mode">{{service_form.loadbalancer_name}}</span>
           </el-form-item>
         </el-col>
       </el-row>
@@ -108,8 +126,8 @@
 
 <script>
   import {check_service_instance_list, get_service, save_service} from '@/api/service'
-  import {get_instance_in_service} from '@/api/instance'
   import {get_registry_list} from "@/api/registry"
+  import {get_loadbalancers} from '@/api/common'
 
   import InstanceList from './instance-list'
   import InstanceEdit from './instance-edit'
@@ -130,10 +148,12 @@
           id: undefined,
           service_name: undefined,
           registry_id: undefined,
+          registry_name: undefined,
           type: "RESTful",
           status: 0,
           remark: undefined,
-          registry_name: undefined
+          loadbalancer: undefined,
+          loadbalancer_name: undefined
         },
         cur_instance_id: undefined,
         rules: {
@@ -144,15 +164,20 @@
         dialogFormVisible: false,
         dialogListVisible: false,
         dialogFormTitle: "",
-        registrys: []
+        registrys: [],
+        loadbalancers: []
       }
     },
     created() {
       const id = this.$route.query.id;
       if (this.edit_mode) {
-        this.doGetRegistry().then(_ => {
-          this.doQueryService(id)
-        })
+        this.doGetRegistry()
+          .then(_ => {
+            return this.doGetLoadBalancer()
+          })
+          .then(_ => {
+            this.doQueryService(id)
+          })
       } else {
         this.doQueryService(id)
       }
@@ -179,7 +204,6 @@
     },
     methods: {
       doQueryService(id) {
-        console.log('service', this.$route)
         if (!id) {
           return
         }
@@ -229,11 +253,16 @@
       doCloseListDialog() {
       },
       doGetRegistry() {
-        return get_registry_list()
-          .then(resp => {
-            this.registrys = resp.data
-            return Promise.resolve()
-          })
+        return get_registry_list().then(resp => {
+          this.registrys = resp.data
+          return Promise.resolve()
+        })
+      },
+      doGetLoadBalancer() {
+        return get_loadbalancers(null, null).then(resp => {
+          this.loadbalancers = resp.data
+          return Promise.resolve();
+        })
       },
       validRegistry(rule, value, callback) {
         if (this.service_form.type == 'dubbo' && !this.service_form.registry_id) {

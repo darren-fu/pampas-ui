@@ -6,74 +6,73 @@
         <el-form ref="rule_list_form" class="rule_form" :model="rule_form" size="mini" :rules="valid_rules"
                  label-width="120px" hide-required-asterisk
                  @submit.native.prevent>
-            <inner-rule-list lockAxis="y" v-model="rule_form.rule_list">
-              <inner-rul-item v-for="(rule, index) in rule_form.rule_list" :key="index" :index="index" :item="rule">
-                <el-card shadow="hover" :body-style="{ padding: '5px'}" style="margin: 5px;border: 1px solid #808080;">
-                  <el-row>
-                    <el-col :span="12">
-                      <el-form-item label="规则类型" class="rule_label" :prop="'rule_list.' + index + '.type'"
-                                    :rules="[
+          <el-row>
+            <el-col :span="24" v-for="(rule, index) in rule_form.rule_list" :key="index" :offset="index > 0 ? 0 : 0"
+            >
+              <el-card shadow="hover" :body-style="{ padding: '5px'}" style="margin: 5px;border: 1px solid #808080;">
+                <el-row>
+                  <el-col :span="12">
+                    <el-form-item label="规则类型" class="rule_label" :prop="'rule_list.' + index + '.type'"
+                                  :rules="[
                           { required: true, message: '请选择规则类型', trigger: 'change' },
                         ]">
-                        <el-select v-model="rule.type" style="width: 40%">
-                          <el-option label="HTTP" value="http"/>
-                          <el-option label="DUBBO" value="dubbo"/>
-                          <el-option label="GRPC" value="grpc"/>
-                        </el-select>
-                      </el-form-item>
-                    </el-col>
-                    <el-col :span="12">
-                      <el-form-item label="路由服务" class="rule_label" :prop="'rule_list.' + index + '.service'"
-                                    :rules="[
+                      <el-select v-model="rule.type" style="width: 40%">
+                        <el-option label="HTTP" value="http"/>
+                        <el-option label="DUBBO" value="dubbo"/>
+                        <el-option label="GRPC" value="grpc"/>
+                      </el-select>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="12">
+                    <el-form-item label="路由服务" class="rule_label" :prop="'rule_list.' + index + '.service'"
+                                  :rules="[
                           { required: true, message: '请选择路由服务', trigger: 'blur' },
                         ]">
-                        <el-select v-model="rule.service"
-                                   clearable
-                                   placeholder="请选择">
-                          <el-option
-                            v-for="item in services"
-                            :key="item.id"
-                            :label="item.service_name"
-                            :value="item.service_name">
-                          </el-option>
-                        </el-select>
+                      <el-select v-model="rule.service"
+                                 clearable
+                                 placeholder="请选择">
+                        <el-option
+                          v-for="item in services"
+                          :key="item.id"
+                          :label="item.service_name"
+                          :value="item.service_name">
+                        </el-option>
+                      </el-select>
 
-                      </el-form-item>
-                    </el-col>
-                    <el-col :span="12">
-                      <el-form-item label="匹配请求路径" class="rule_label" :prop="'rule_list.' + index + '.path'">
-                        <el-input v-model="rule.path"></el-input>
-                      </el-form-item>
-                    </el-col>
-                    <el-col :span="12" v-show="rule.type == 'http'">
-                      <el-form-item label="路径映射策略" class="rule_label" :prop="'rule_list.' + index + '.mapped_path'">
-                        <el-input placeholder="请求路径将按照指定策略进行映射" v-model="rule.mapping_path" class="input-with-select">
-                          <el-select v-model="rule.mapping_strategy" slot="prepend">
-                            <el-option label="移除字符" value="strip"/>
-                            <el-option label="指定路径" value="appoint"/>
-                          </el-select>
-                        </el-input>
-                      </el-form-item>
-                    </el-col>
-                    <el-col :span="12">
-                      <el-form-item label="目标服务地址" class="rule_label" :prop="'rule_list.' + index + '.mapping_host'"
-                                    :rules="[{validator: checkMappingHost, trigger: 'change'}
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="12">
+                    <el-form-item label="匹配请求路径" class="rule_label" :prop="'rule_list.' + index + '.path'">
+                      <el-input v-model="rule.path"></el-input>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="12" v-show="rule.type == 'http'">
+                    <el-form-item label="路径映射策略" class="rule_label" :prop="'rule_list.' + index + '.mapped_path'">
+                      <el-input placeholder="请求路径将按照指定策略进行映射" v-model="rule.mapping_path" class="input-with-select">
+                        <el-select v-model="rule.mapping_strategy" slot="prepend">
+                          <el-option label="移除字符" value="strip"/>
+                          <el-option label="指定路径" value="appoint"/>
+                        </el-select>
+                      </el-input>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="12">
+                    <el-form-item label="目标服务地址" class="rule_label" :prop="'rule_list.' + index + '.mapping_host'"
+                                  :rules="[{validator: checkMappingHost, trigger: 'change'}
                                   ]">
-                        <el-select v-model="rule.host_strategy" placeholder="请求将路由到目标服务"
-                                   style="width: 100%">
-                          <el-option :label="'自动使用路由服务的实例'" value="auto"/>
-                          <el-option label="指定目标服务地址" value="appoint"/>
-                        </el-select>
-                        <el-input v-show="rule.host_strategy == 'appoint'" v-model="rule.mapping_host"
-                                  placeholder="默认映射当前服务下的实例地址" style="width: 100%"></el-input>
-                      </el-form-item>
-                    </el-col>
-                  </el-row>
-                </el-card>
-              </inner-rul-item>
-
-            </inner-rule-list>
-
+                      <el-select v-model="rule.host_strategy" placeholder="请求将路由到目标服务"
+                                 style="width: 100%">
+                        <el-option :label="'自动使用路由服务的实例'" value="auto"/>
+                        <el-option label="指定目标服务地址" value="appoint"/>
+                      </el-select>
+                      <el-input v-show="rule.host_strategy == 'appoint'" v-model="rule.mapping_host"
+                                placeholder="默认映射当前服务下的实例地址" style="width: 100%"></el-input>
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+              </el-card>
+            </el-col>
+          </el-row>
           <el-row>
             <el-col :span="24">
               <el-card :body-style="{ padding: '10px','text-align': 'center'}" style="margin: 10px">
@@ -105,15 +104,14 @@
   import {isJSON, isYAML, toJSON, toYAML} from '@/utils/json'
   import {get_route_rule, save_route_rule} from '@/api/route-rule'
   import {get_service_list} from "@/api/service"
-  import InnerRuleList from './inner-rule-list'
-  import InnerRulItem from './inner-rule-item'
+
 
   export default {
     name: "rule-edit",
     props: {
       rule_id: {type: Number, default: undefined},
     },
-    components: {Monaco, InnerRuleList, InnerRulItem},
+    components: {Monaco},
     data() {
       return {
         yaml: undefined,
@@ -258,14 +256,12 @@
   .rule_form .el-form-item--mini.el-form-item {
     margin-bottom: 6px;
   }
-
-  .dragging {
+  .dragging{
     background-color: #001528;
     color: #0000ff;
   }
-
   /*.dragging .rule_label{*/
-  /*background-color: #0074D9;*/
-  /*color: #0000ff;*/
+    /*background-color: #0074D9;*/
+    /*color: #0000ff;*/
   /*}*/
 </style>

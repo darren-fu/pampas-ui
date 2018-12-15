@@ -117,6 +117,9 @@
       loadTree() {
         return get_gateway_tree().then(resp => {
           this.gatewayTreeData = resp.data
+          if (this.defaultGatewayExpandIds.length == 0 && this.gatewayTreeData.length > 0) {
+            this.defaultGatewayExpandIds.push(this.gatewayTreeData[0].id)
+          }
           return Promise.resolve();
         }).then(_ => {
           return get_rule_tree()
@@ -172,6 +175,10 @@
         }
       },
       do_check_rel_rule(gateway_id) {
+        if (!gateway_id && this.ruleTreeData.length > 0) {
+          this.defaultRuleExpandIds.push(this.ruleTreeData[0].id)
+          return;
+        }
         get_rel_rules(gateway_id).then(resp => {
           let ids = resp.data.map(v => {
             return v.id;

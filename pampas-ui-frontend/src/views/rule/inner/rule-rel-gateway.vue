@@ -109,6 +109,7 @@
 
   .box-card {
     min-width: 580px;
+    border-radius: 0px;
   }
 
   .box-card .el-card__header {

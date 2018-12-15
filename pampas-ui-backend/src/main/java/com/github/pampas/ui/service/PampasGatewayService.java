@@ -66,9 +66,25 @@ public interface PampasGatewayService extends IngressService {
      */
     Response<Result<GatewayTreeResp>> getGatewayTree();
 
-    Response<Result<GatewayConfigResp>> getGatewayConfigList(Integer gatewayId,String gatewayGroup, String gatewayInstanceId);
+    /**
+     * 获取网关Config列表
+     *
+     * @param gatewayId         the gateway id
+     * @param gatewayGroup      the gateway group
+     * @param gatewayInstanceId the gateway instance id
+     * @return the gateway config list
+     */
+    Response<Result<GatewayConfigResp>> getGatewayConfigList(Integer gatewayId, String gatewayGroup, String gatewayInstanceId);
 
-    Response<Result<GatewaySpiResp>> getGatewaySpiList(Integer gatewayId,String gatewayGroup, String gatewayInstanceId);
+    /**
+     * 获取网关SPI列表
+     *
+     * @param gatewayId         the gateway id
+     * @param gatewayGroup      the gateway group
+     * @param gatewayInstanceId the gateway instance id
+     * @return the gateway spi list
+     */
+    Response<Result<GatewaySpiResp>> getGatewaySpiList(Integer gatewayId, String gatewayGroup, String gatewayInstanceId);
 
 
 }

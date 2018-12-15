@@ -17,4 +17,5 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class GatewayConfigResp extends GatewayConfig {
+    private Integer rowSpan;
 }
