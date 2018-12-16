@@ -85,8 +85,10 @@ public class PampasGatewayController {
     @RequestMapping(value = "/gateway/get_config_list", method = RequestMethod.GET)
     public Response<Result<GatewayConfigResp>> getConfigList(@RequestParam(value = "id", required = false) Integer gatewayId,
                                                              @RequestParam(value = "group", required = false) String gatewayGroup,
-                                                             @RequestParam(value = "instance_id", required = false) String gatewayInstanceId) {
-        return gatewayService.getGatewayConfigList(gatewayId, gatewayGroup, gatewayInstanceId);
+                                                             @RequestParam(value = "instance_id", required = false) String gatewayInstanceId,
+                                                             @RequestParam(value = "spi_class", required = false) String spiClass
+    ) {
+        return gatewayService.getGatewayConfigList(gatewayId, gatewayGroup, gatewayInstanceId, spiClass);
     }
 
     @RequestMapping(value = "/gateway/get_spi_list", method = RequestMethod.GET)

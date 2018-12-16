@@ -83,11 +83,11 @@ export function save_gateway_rule_rel(form_data) {
  * 获取gateway CONFIG
  * @param form_data
  */
-export function get_gateway_config(id, group, instance_id) {
+export function get_gateway_config(id, group, instance_id, spi_class) {
   return request({
     url: '/gateway/get_config_list',
     method: 'get',
-    params: {id: id, group: group, instance_id: instance_id}
+    params: {id: id, group: group, instance_id: instance_id, spi_class: spi_class}
   })
 }
 

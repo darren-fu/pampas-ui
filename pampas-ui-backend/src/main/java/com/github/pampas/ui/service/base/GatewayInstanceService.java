@@ -70,5 +70,5 @@ public interface GatewayInstanceService {
 
     List<GatewaySpi> getSpiList(String gatewayGroup, String gatewayInstanceId);
 
-    List<GatewayConfig> getGatewayConfigList(String gatewayGroup, String gatewayInstanceId);
+    List<GatewayConfig> getGatewayConfigList(String gatewayGroup, String gatewayInstanceId, String spiClass);
 }

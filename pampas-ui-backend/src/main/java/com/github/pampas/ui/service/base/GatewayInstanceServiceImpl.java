@@ -210,7 +210,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
     }
 
     @Override
-    public List<GatewayConfig> getGatewayConfigList(String gatewayGroup, String gatewayInstanceId) {
+    public List<GatewayConfig> getGatewayConfigList(String gatewayGroup, String gatewayInstanceId, String spiClass) {
         GatewayConfigCondition configCondition = new GatewayConfigCondition();
         GatewayConfigCondition.Criteria criteria = configCondition.createCriteria();
         if (StringUtils.isNotEmpty(gatewayGroup)) {
@@ -218,6 +218,9 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
         }
         if (StringUtils.isNotEmpty(gatewayInstanceId)) {
             criteria.andGatewayInstanceIdEqualTo(gatewayInstanceId);
+        }
+        if (StringUtils.isNotEmpty(spiClass)) {
+            criteria.andConfigSpiClassEqualTo(spiClass);
         }
         configCondition.orderBy("config_spi_interface, config_spi_class");
         List<GatewayConfig> gatewayConfigList = gatewayConfigMapper.selectByExample(configCondition);

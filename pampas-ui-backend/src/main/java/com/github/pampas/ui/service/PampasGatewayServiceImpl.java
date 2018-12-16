@@ -109,14 +109,14 @@ public class PampasGatewayServiceImpl implements PampasGatewayService {
     }
 
     @Override
-    public Response<Result<GatewayConfigResp>> getGatewayConfigList(Integer gatewayId, String gatewayGroup, String gatewayInstanceId) {
+    public Response<Result<GatewayConfigResp>> getGatewayConfigList(Integer gatewayId, String gatewayGroup, String gatewayInstanceId, String spiClass) {
         if (gatewayId != null) {
             List<GatewayInstance> gateway = gatewayInstanceService.getGateway(gatewayId);
             AssertTools.notEmpty(gateway, "不存在此网关:" + gatewayId);
             gatewayGroup = gateway.get(0).getGroup();
         }
         AssertTools.notEmpty(gatewayGroup, "网关分组不能为空");
-        List<GatewayConfig> gatewayConfigList = gatewayInstanceService.getGatewayConfigList(gatewayGroup, gatewayInstanceId);
+        List<GatewayConfig> gatewayConfigList = gatewayInstanceService.getGatewayConfigList(gatewayGroup, gatewayInstanceId, spiClass);
         List<GatewayConfigResp> gatewayConfigResps = BeanTools.copyBeans(gatewayConfigList, GatewayConfigResp.class);
 
         Map<String, List<GatewayConfigResp>> listMap = StreamTools.groupBy(gatewayConfigResps, GatewayConfigResp::getConfigSpiClass);
