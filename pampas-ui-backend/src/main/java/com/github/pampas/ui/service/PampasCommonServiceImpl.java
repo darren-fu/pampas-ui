@@ -21,8 +21,8 @@ import java.util.stream.Collectors;
  * Date: 2018-12-14
  */
 @Service
-public class GatewayCommonServiceImpl implements GatewayCommonService {
-    private static final Logger log = LoggerFactory.getLogger(GatewayCommonServiceImpl.class);
+public class PampasCommonServiceImpl implements PampasCommonService {
+    private static final Logger log = LoggerFactory.getLogger(PampasCommonServiceImpl.class);
 
     @Autowired
     private GatewaySpiService gatewaySpiService;

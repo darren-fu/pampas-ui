@@ -3,6 +3,7 @@ package com.github.pampas.ui.service;
 import com.github.pampas.ui.base.IngressService;
 import com.github.pampas.ui.base.vo.Response;
 import com.github.pampas.ui.base.vo.Result;
+import com.github.pampas.ui.vo.req.GatewayConfigSaveReq;
 import com.github.pampas.ui.vo.req.GatewayInstanceListReq;
 import com.github.pampas.ui.vo.req.GatewayInstanceSaveReq;
 import com.github.pampas.ui.vo.req.RuleRelGatewaySaveReq;
@@ -86,6 +87,14 @@ public interface PampasGatewayService extends IngressService {
      * @return the gateway spi list
      */
     Response<Result<GatewaySpiResp>> getGatewaySpiList(Integer gatewayId, String gatewayGroup, String gatewayInstanceId);
+
+
+    /**
+     *
+     * @param req
+     * @return
+     */
+    Response saveGatewayConfig(GatewayConfigSaveReq req);
 
 
 }

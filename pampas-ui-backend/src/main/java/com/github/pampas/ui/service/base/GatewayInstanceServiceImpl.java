@@ -57,6 +57,22 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
     }
 
     @Override
+    public List<GatewayInstance> getGatewayList(String group, String gatewayInstanceId) {
+        GatewayInstanceCondition condition = new GatewayInstanceCondition();
+        GatewayInstanceCondition.Criteria criteria = condition.createCriteria();
+
+        if (StringUtils.isNotEmpty(group)) {
+            criteria.andGroupEqualTo(group);
+        }
+        if (StringUtils.isNotEmpty(gatewayInstanceId)) {
+            criteria.andInstanceIdEqualTo(gatewayInstanceId);
+        }
+        List<GatewayInstance> gatewayInstances = gatewayInstanceMapper.selectByExample(condition);
+        log.info("查询网关列表:{}", gatewayInstances);
+        return gatewayInstances;
+    }
+
+    @Override
     public Result<GatewayInstance> getGatewayList(GatewayInstanceListReq req, Integer pageNum, Integer pageSize) {
         GatewayInstanceCondition condition = new GatewayInstanceCondition();
         GatewayInstanceCondition.Criteria criteria = condition.createCriteria();
@@ -194,37 +210,5 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
         log.info("保存路由规则:{} 和网关关系成功:{}", ruleIdList, gatewayIdList);
     }
 
-    @Override
-    public List<GatewaySpi> getSpiList(String gatewayGroup, String gatewayInstanceId) {
-        GatewaySpiCondition condition = new GatewaySpiCondition();
-        GatewaySpiCondition.Criteria criteria = condition.createCriteria();
-        if (StringUtils.isNotEmpty(gatewayGroup)) {
-            criteria.andGatewayGroupEqualTo(gatewayGroup);
-        }
-        if (StringUtils.isNotEmpty(gatewayInstanceId)) {
-            criteria.andGatewayInstanceIdEqualTo(gatewayInstanceId);
-        }
-        List<GatewaySpi> gatewaySpiList = gatewaySpiMapper.selectByExample(condition);
-        log.info("获取网关SPI列表:{}", gatewaySpiList);
-        return gatewaySpiList;
-    }
 
-    @Override
-    public List<GatewayConfig> getGatewayConfigList(String gatewayGroup, String gatewayInstanceId, String spiClass) {
-        GatewayConfigCondition configCondition = new GatewayConfigCondition();
-        GatewayConfigCondition.Criteria criteria = configCondition.createCriteria();
-        if (StringUtils.isNotEmpty(gatewayGroup)) {
-            criteria.andGatewayGroupEqualTo(gatewayGroup);
-        }
-        if (StringUtils.isNotEmpty(gatewayInstanceId)) {
-            criteria.andGatewayInstanceIdEqualTo(gatewayInstanceId);
-        }
-        if (StringUtils.isNotEmpty(spiClass)) {
-            criteria.andConfigSpiClassEqualTo(spiClass);
-        }
-        configCondition.orderBy("config_spi_interface, config_spi_class");
-        List<GatewayConfig> gatewayConfigList = gatewayConfigMapper.selectByExample(configCondition);
-        log.info("查询获取当前网关配置项{}条:{}", gatewayConfigList.size(), gatewayConfigList);
-        return gatewayConfigList;
-    }
 }

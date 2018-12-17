@@ -91,6 +91,18 @@ export function get_gateway_config(id, group, instance_id, spi_class) {
   })
 }
 
+/**
+ * 通知gateway拉取最新的  CONFIG
+ * @param form_data
+ */
+export function notify_gateway_config(group, instance_id, spi_class) {
+  return request({
+    url: '/gateway/notify_config',
+    method: 'get',
+    params: {group: group, instance_id: instance_id, spi_class: spi_class}
+  })
+}
+
 
 /**
  * 获取gateway SPI
@@ -103,6 +115,19 @@ export function get_gateway_spi(id, group, instance_id) {
     params: {id: id, group: group, instance_id: instance_id}
   })
 }
+
+/**
+ * 保存gateway config
+ * @param form_data
+ */
+export function save_gateway_config(form_data) {
+  return request({
+    url: '/gateway/save_config',
+    method: 'post',
+    data: form_data
+  })
+}
+
 
 
 

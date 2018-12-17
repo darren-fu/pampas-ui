@@ -1,12 +1,6 @@
 <template>
   <div>
-    <el-row v-if="tableData.length == 0">
-      <el-col :span="24">
-        <el-card :body-style="{ padding: '10px','text-align': 'center'}" style="margin: 10px">
-          <el-button type="" icon="el-icon-plus" @click="doRelRule">关联路由规则</el-button>
-        </el-card>
-      </el-col>
-    </el-row>
+
 
     <el-table v-if="tableData.length > 0"
               v-loading="listLoading"
@@ -42,6 +36,13 @@
         </template>
       </el-table-column>
     </el-table>
+    <el-row >
+      <el-col :span="24">
+        <el-card :body-style="{ padding: '5px','text-align': 'center'}" style="margin-top: 10px">
+          <el-button type="" icon="el-icon-plus" @click="doRelRule">关联路由规则</el-button>
+        </el-card>
+      </el-col>
+    </el-row>
   </div>
 </template>
 

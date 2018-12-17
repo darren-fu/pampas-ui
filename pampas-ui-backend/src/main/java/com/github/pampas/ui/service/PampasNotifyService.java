@@ -1,14 +1,19 @@
 package com.github.pampas.ui.service;
 
+import com.github.pampas.ui.base.IngressService;
+import com.github.pampas.ui.base.vo.Response;
+
 /**
  * Description:
  * User: darrenfu
  * Date: 2018-12-15
  */
-public interface GatewayNotifyService {
+public interface PampasNotifyService extends IngressService {
 
     String notifyConfigLoaderWithKey(String group, String gatewayInstanceId, String configLoaderKey);
 
     String notifyConfigLoaderWithName(String group, String gatewayInstanceId, String configLoaderName);
 
+
+    Response notifyGatewayConfigUpdate(String group, String gatewayInstanceId, String configSpiClass);
 }

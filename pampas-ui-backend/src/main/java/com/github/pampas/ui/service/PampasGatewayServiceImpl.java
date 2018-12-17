@@ -6,8 +6,10 @@ import com.github.pampas.storage.entity.*;
 import com.github.pampas.ui.base.vo.Response;
 import com.github.pampas.ui.base.vo.Result;
 import com.github.pampas.ui.service.base.GatewayInstanceService;
+import com.github.pampas.ui.service.base.GatewaySpiService;
 import com.github.pampas.ui.service.base.RouteRuleService;
 import com.github.pampas.ui.utils.BeanTools;
+import com.github.pampas.ui.vo.req.GatewayConfigSaveReq;
 import com.github.pampas.ui.vo.req.GatewayInstanceListReq;
 import com.github.pampas.ui.vo.req.GatewayInstanceSaveReq;
 import com.github.pampas.ui.vo.req.RuleRelGatewaySaveReq;
@@ -33,6 +35,9 @@ public class PampasGatewayServiceImpl implements PampasGatewayService {
 
     @Autowired
     private RouteRuleService routeRuleService;
+
+    @Autowired
+    private GatewaySpiService gatewaySpiService;
 
     @Override
     public Response<GatewayInstanceResp> getGateway(Integer gatewayId) {
@@ -110,13 +115,15 @@ public class PampasGatewayServiceImpl implements PampasGatewayService {
 
     @Override
     public Response<Result<GatewayConfigResp>> getGatewayConfigList(Integer gatewayId, String gatewayGroup, String gatewayInstanceId, String spiClass) {
+        String instanceId = gatewayInstanceId;
         if (gatewayId != null) {
             List<GatewayInstance> gateway = gatewayInstanceService.getGateway(gatewayId);
             AssertTools.notEmpty(gateway, "不存在此网关:" + gatewayId);
             gatewayGroup = gateway.get(0).getGroup();
+            instanceId = gateway.get(0).getInstanceId();
         }
         AssertTools.notEmpty(gatewayGroup, "网关分组不能为空");
-        List<GatewayConfig> gatewayConfigList = gatewayInstanceService.getGatewayConfigList(gatewayGroup, gatewayInstanceId, spiClass);
+        List<GatewayConfig> gatewayConfigList = gatewaySpiService.getGatewayConfigList(gatewayGroup, instanceId, spiClass);
         List<GatewayConfigResp> gatewayConfigResps = BeanTools.copyBeans(gatewayConfigList, GatewayConfigResp.class);
 
         Map<String, List<GatewayConfigResp>> listMap = StreamTools.groupBy(gatewayConfigResps, GatewayConfigResp::getConfigSpiClass);
@@ -142,8 +149,17 @@ public class PampasGatewayServiceImpl implements PampasGatewayService {
             gatewayInstanceId = gateway.get(0).getInstanceId();
         }
         AssertTools.notEmpty(gatewayGroup, "网关分组不能为空");
-        List<GatewaySpi> spiList = gatewayInstanceService.getSpiList(gatewayGroup, gatewayInstanceId);
+        List<GatewaySpi> spiList = gatewaySpiService.getSpiList(gatewayGroup, gatewayInstanceId);
         List<GatewaySpiResp> spiResps = BeanTools.copyBeans(spiList, GatewaySpiResp.class);
         return Response.buildSuccessResponseWithResult(spiResps, spiResps.size());
+    }
+
+    @Override
+    public Response saveGatewayConfig(GatewayConfigSaveReq req) {
+        List<GatewayConfigSaveReq.KeyAndVal> list = req.getList();
+        List<GatewayConfig> gatewayConfigList = BeanTools.copyBeans(list, GatewayConfig.class);
+        gatewayConfigList.forEach(v -> v.setPush(""));
+        gatewaySpiService.saveGatewayConfig(gatewayConfigList);
+        return Response.buildSuccessEmptyResponse();
     }
 }

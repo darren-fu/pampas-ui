@@ -23,8 +23,8 @@
           <el-tab-pane label="路由关联" name="rel" lazy>
             <gateway-rel-rule :gateway_id="id"></gateway-rel-rule>
           </el-tab-pane>
-          <el-tab-pane label="推送配置" name="push" lazy>
-            <gateway-push :gateway_id="id"></gateway-push>
+          <el-tab-pane label="通知网关刷新配置" name="push" lazy>
+            <gateway-notify :gateway_id="id"></gateway-notify>
           </el-tab-pane>
         </el-tabs>
       </el-card>
@@ -38,12 +38,12 @@
   import GatewayConfig from './inner/gateway-config'
   import GatewaySpi from './inner/gateway-spi'
   import GatewayRelRule from './inner/gateway-rel-rule'
-  import GatewayPush from './inner/gateway-push'
+  import GatewayNotify from './inner/gateway-notify'
 
 
   export default {
     name: "gateway-view",
-    components: {GatewayDetail, GatewayConfig, GatewaySpi, GatewayRelRule, GatewayPush},
+    components: {GatewayDetail, GatewayConfig, GatewaySpi, GatewayRelRule, GatewayNotify},
     data() {
       return {
         id: undefined,

@@ -27,7 +27,17 @@ public interface GatewayInstanceService {
     List<GatewayInstance> getGateway(Integer... gatewayId);
 
     /**
-     * Gets gateway list.
+     * 查询列表 精确查询
+     *
+     * @param group             the group
+     * @param gatewayInstanceId the gateway instance id
+     * @return the gateway list
+     */
+    List<GatewayInstance> getGatewayList(String group, String gatewayInstanceId);
+
+
+    /**
+     * 查询列表 模糊查询 分页
      *
      * @param req      the req
      * @param pageNum  the page num
@@ -68,7 +78,5 @@ public interface GatewayInstanceService {
     void saveRel(List<Integer> gatewayIdList, List<Integer> ruleIdList);
 
 
-    List<GatewaySpi> getSpiList(String gatewayGroup, String gatewayInstanceId);
 
-    List<GatewayConfig> getGatewayConfigList(String gatewayGroup, String gatewayInstanceId, String spiClass);
 }

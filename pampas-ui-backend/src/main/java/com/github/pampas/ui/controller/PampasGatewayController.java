@@ -3,6 +3,8 @@ package com.github.pampas.ui.controller;
 import com.github.pampas.ui.base.vo.Response;
 import com.github.pampas.ui.base.vo.Result;
 import com.github.pampas.ui.service.PampasGatewayService;
+import com.github.pampas.ui.service.PampasNotifyService;
+import com.github.pampas.ui.vo.req.GatewayConfigSaveReq;
 import com.github.pampas.ui.vo.req.GatewayInstanceListReq;
 import com.github.pampas.ui.vo.req.GatewayInstanceSaveReq;
 import com.github.pampas.ui.vo.req.RuleRelGatewaySaveReq;
@@ -22,6 +24,9 @@ public class PampasGatewayController {
 
     @Autowired
     private PampasGatewayService gatewayService;
+
+    @Autowired
+    private PampasNotifyService notifyService;
 
     /**
      * Gets gateway.
@@ -86,8 +91,7 @@ public class PampasGatewayController {
     public Response<Result<GatewayConfigResp>> getConfigList(@RequestParam(value = "id", required = false) Integer gatewayId,
                                                              @RequestParam(value = "group", required = false) String gatewayGroup,
                                                              @RequestParam(value = "instance_id", required = false) String gatewayInstanceId,
-                                                             @RequestParam(value = "spi_class", required = false) String spiClass
-    ) {
+                                                             @RequestParam(value = "spi_class", required = false) String spiClass) {
         return gatewayService.getGatewayConfigList(gatewayId, gatewayGroup, gatewayInstanceId, spiClass);
     }
 
@@ -97,5 +101,21 @@ public class PampasGatewayController {
                                                        @RequestParam(value = "instance_id", required = false) String gatewayInstanceId) {
         return gatewayService.getGatewaySpiList(gatewayId, gatewayGroup, gatewayInstanceId);
     }
+
+
+    @RequestMapping(value = "/gateway/save_config", method = RequestMethod.POST)
+    public Response saveGatewayConfig(@RequestBody GatewayConfigSaveReq req) {
+        return gatewayService.saveGatewayConfig(req);
+    }
+
+
+    @RequestMapping(value = "/gateway/notify_config", method = RequestMethod.GET)
+    public Response getSpiList(
+            @RequestParam(value = "group", required = false) String gatewayGroup,
+            @RequestParam(value = "instance_id", required = false) String gatewayInstanceId,
+            @RequestParam(value = "spi_class", required = false) String configSpiClass) {
+        return notifyService.notifyGatewayConfigUpdate(gatewayGroup, gatewayInstanceId, configSpiClass);
+    }
+
 
 }

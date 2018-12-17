@@ -10,7 +10,7 @@ import com.github.pampas.ui.vo.resp.GatewaySpiResp;
  * User: darrenfu
  * Date: 2018-12-14
  */
-public interface GatewayCommonService extends IngressService{
+public interface PampasCommonService extends IngressService{
 
     Response<Result<GatewaySpiResp>> getSpiClassList(String spiInterface, String group, String gatewayInstanceId);
 }

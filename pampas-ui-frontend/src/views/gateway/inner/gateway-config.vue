@@ -8,21 +8,21 @@
       :span-method="objectSpanMethod"
       stripe
       style="width: 100%;margin-top: 10px">
-
+      <el-table-column
+        prop="config_spi_desc"
+        label="所属分类"
+        width="160">
+      </el-table-column>
       <el-table-column
         prop="gateway_instance_id"
         label="生效级别"
         width="90px"
       >
         <template slot-scope="scope">
-          <span style="">{{ scope.row.gateway_instance_id?'实例级别':'分组级别' }}</span>
+          <span style="">{{ scope.row.gateway_instance_id?'单独生效':'整组生效' }}</span>
         </template>
       </el-table-column>
-      <el-table-column
-        prop="config_spi_desc"
-        label="所属分类"
-        width="160">
-      </el-table-column>
+
       <el-table-column
         prop="key"
         label="配置项"
@@ -37,6 +37,9 @@
         prop="value"
         label="配置值"
       >
+        <template slot-scope="scope">
+          <pre style="margin: 0px">{{scope.row.value}}</pre>
+        </template>
       </el-table-column>
 
       <el-table-column
@@ -50,8 +53,11 @@
     </el-table>
 
     <el-dialog title="编辑自定义配置" width="75%" :visible.sync="dialogFormVisible" @close="doCloseDialog">
-      <config-edit ref="config_edit" :gateway_group="edit_group" :config_spi_class="edit_spi_class"
-                   :edit_spi_desc="edit_spi_desc"></config-edit>
+      <config-edit ref="config_edit" @update-config="reloadConfig"
+                   :gateway_group="edit_group"
+                   :gateway_instance_id="edit_gateway_instance_id"
+                   :config_spi_class="edit_spi_class"
+                   :config_spi_desc="edit_spi_desc"></config-edit>
     </el-dialog>
   </div>
 </template>
@@ -91,7 +97,7 @@
         })
       },
       objectSpanMethod({row, column, rowIndex, columnIndex}) {
-        if (columnIndex == 0 || columnIndex == 1 || columnIndex == 5) {
+        if (columnIndex == 0 || columnIndex == 5) {
           if (row.row_span != null) {
             return {
               rowspan: row.row_span,
@@ -104,6 +110,9 @@
             }
           }
         }
+      },
+      reloadConfig() {
+        this.doLoad(this.gateway_id)
       },
       doEditConfig(row) {
         this.dialogFormVisible = true;
