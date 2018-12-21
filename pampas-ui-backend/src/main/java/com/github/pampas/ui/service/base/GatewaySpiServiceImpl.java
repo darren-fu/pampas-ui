@@ -64,7 +64,7 @@ public class GatewaySpiServiceImpl implements GatewaySpiService {
     }
 
     @Override
-    public List<GatewaySpi> getSpiList(String gatewayGroup, String gatewayInstanceId) {
+    public List<GatewaySpi> getSpiList(String gatewayGroup, String gatewayInstanceId, String spiInterface) {
         GatewaySpiCondition condition = new GatewaySpiCondition();
         GatewaySpiCondition.Criteria criteria = condition.createCriteria();
         if (StringUtils.isNotEmpty(gatewayGroup)) {
@@ -73,6 +73,12 @@ public class GatewaySpiServiceImpl implements GatewaySpiService {
         if (StringUtils.isNotEmpty(gatewayInstanceId)) {
             criteria.andGatewayInstanceIdEqualTo(gatewayInstanceId);
         }
+        if (StringUtils.isNotEmpty(spiInterface)) {
+            criteria.andSpiInterfaceEqualTo(spiInterface);
+        }
+
+        condition.orderBy("`spi_interface` asc, `status` asc, `order` asc");
+
         List<GatewaySpi> gatewaySpiList = gatewaySpiMapper.selectByExample(condition);
         log.info("获取网关SPI列表:{}", gatewaySpiList);
         return gatewaySpiList;
@@ -120,7 +126,17 @@ public class GatewaySpiServiceImpl implements GatewaySpiService {
         for (GatewayConfig gatewayConfig : configList) {
             if (gatewayConfig.getId() != null) {
                 gatewayConfigMapper.updateByPrimaryKeySelective(gatewayConfig);
-                log.info("保存配置成功:{}", gatewayConfig);
+                log.info("保存<CONFIG>配置成功:{}", gatewayConfig);
+            }
+        }
+    }
+
+    @Override
+    public void saveGatewaySpi(List<GatewaySpi> spiList) {
+        for (GatewaySpi gatewaySpi : spiList) {
+            if (gatewaySpi.getId() != null) {
+                gatewaySpiMapper.updateByPrimaryKeySelective(gatewaySpi);
+                log.info("保存<SPI>配置成功:{}", gatewaySpi);
             }
         }
     }

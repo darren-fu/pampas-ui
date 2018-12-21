@@ -4,10 +4,7 @@ import com.github.pampas.ui.base.vo.Response;
 import com.github.pampas.ui.base.vo.Result;
 import com.github.pampas.ui.service.PampasGatewayService;
 import com.github.pampas.ui.service.PampasNotifyService;
-import com.github.pampas.ui.vo.req.GatewayConfigSaveReq;
-import com.github.pampas.ui.vo.req.GatewayInstanceListReq;
-import com.github.pampas.ui.vo.req.GatewayInstanceSaveReq;
-import com.github.pampas.ui.vo.req.RuleRelGatewaySaveReq;
+import com.github.pampas.ui.vo.req.*;
 import com.github.pampas.ui.vo.resp.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -98,8 +95,9 @@ public class PampasGatewayController {
     @RequestMapping(value = "/gateway/get_spi_list", method = RequestMethod.GET)
     public Response<Result<GatewaySpiResp>> getSpiList(@RequestParam(value = "id", required = false) Integer gatewayId,
                                                        @RequestParam(value = "group", required = false) String gatewayGroup,
-                                                       @RequestParam(value = "instance_id", required = false) String gatewayInstanceId) {
-        return gatewayService.getGatewaySpiList(gatewayId, gatewayGroup, gatewayInstanceId);
+                                                       @RequestParam(value = "instance_id", required = false) String gatewayInstanceId,
+                                                       @RequestParam(value = "spi_interface", required = false) String spiInterface) {
+        return gatewayService.getGatewaySpiList(gatewayId, gatewayGroup, gatewayInstanceId, spiInterface);
     }
 
 
@@ -108,14 +106,26 @@ public class PampasGatewayController {
         return gatewayService.saveGatewayConfig(req);
     }
 
+    @RequestMapping(value = "/gateway/save_spi", method = RequestMethod.POST)
+    public Response saveGatewayConfig(@RequestBody GatewaySpiSaveReq req) {
+        return gatewayService.saveGatewaySpi(req);
+    }
+
 
     @RequestMapping(value = "/gateway/notify_config", method = RequestMethod.GET)
-    public Response getSpiList(
+    public Response notifyConfigUpdate(
             @RequestParam(value = "group", required = false) String gatewayGroup,
             @RequestParam(value = "instance_id", required = false) String gatewayInstanceId,
             @RequestParam(value = "spi_class", required = false) String configSpiClass) {
         return notifyService.notifyGatewayConfigUpdate(gatewayGroup, gatewayInstanceId, configSpiClass);
     }
 
+    @RequestMapping(value = "/gateway/notify_spi", method = RequestMethod.GET)
+    public Response notifySpiUpdate(
+            @RequestParam(value = "group", required = false) String gatewayGroup,
+            @RequestParam(value = "instance_id", required = false) String gatewayInstanceId,
+            @RequestParam(value = "spi_interface", required = false) String spiInterface) {
+        return notifyService.notifyGatewaySpiUpdate(gatewayGroup, gatewayInstanceId, spiInterface);
+    }
 
 }

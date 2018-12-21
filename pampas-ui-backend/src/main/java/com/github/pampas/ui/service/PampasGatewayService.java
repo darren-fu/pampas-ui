@@ -3,10 +3,7 @@ package com.github.pampas.ui.service;
 import com.github.pampas.ui.base.IngressService;
 import com.github.pampas.ui.base.vo.Response;
 import com.github.pampas.ui.base.vo.Result;
-import com.github.pampas.ui.vo.req.GatewayConfigSaveReq;
-import com.github.pampas.ui.vo.req.GatewayInstanceListReq;
-import com.github.pampas.ui.vo.req.GatewayInstanceSaveReq;
-import com.github.pampas.ui.vo.req.RuleRelGatewaySaveReq;
+import com.github.pampas.ui.vo.req.*;
 import com.github.pampas.ui.vo.resp.*;
 
 /**
@@ -73,7 +70,7 @@ public interface PampasGatewayService extends IngressService {
      * @param gatewayId         the gateway id
      * @param gatewayGroup      the gateway group
      * @param gatewayInstanceId the gateway instance id
-     * @param spiClass
+     * @param spiClass          the spi class
      * @return the gateway config list
      */
     Response<Result<GatewayConfigResp>> getGatewayConfigList(Integer gatewayId, String gatewayGroup, String gatewayInstanceId, String spiClass);
@@ -84,17 +81,27 @@ public interface PampasGatewayService extends IngressService {
      * @param gatewayId         the gateway id
      * @param gatewayGroup      the gateway group
      * @param gatewayInstanceId the gateway instance id
+     * @param spiInterface      the spi interface
      * @return the gateway spi list
      */
-    Response<Result<GatewaySpiResp>> getGatewaySpiList(Integer gatewayId, String gatewayGroup, String gatewayInstanceId);
+    Response<Result<GatewaySpiResp>> getGatewaySpiList(Integer gatewayId, String gatewayGroup, String gatewayInstanceId, String spiInterface);
 
 
     /**
+     * 保存网关自定义配置
      *
-     * @param req
-     * @return
+     * @param req the req
+     * @return response
      */
     Response saveGatewayConfig(GatewayConfigSaveReq req);
+
+    /**
+     * 保存网关SPI配置
+     *
+     * @param req the req
+     * @return the response
+     */
+    Response saveGatewaySpi(GatewaySpiSaveReq req);
 
 
 }

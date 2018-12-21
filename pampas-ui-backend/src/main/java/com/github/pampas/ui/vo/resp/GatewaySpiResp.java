@@ -18,4 +18,6 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class GatewaySpiResp extends GatewaySpi {
+    private Integer rowSpan;
+
 }

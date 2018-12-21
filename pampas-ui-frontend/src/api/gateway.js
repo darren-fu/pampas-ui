@@ -103,16 +103,28 @@ export function notify_gateway_config(group, instance_id, spi_class) {
   })
 }
 
+/**
+ * 通知gateway拉取最新的  SPI
+ * @param form_data
+ */
+export function notify_gateway_spi(group, instance_id, spi_interface) {
+  return request({
+    url: '/gateway/notify_spi',
+    method: 'get',
+    params: {group: group, instance_id: instance_id, spi_interface: spi_interface}
+  })
+}
+
 
 /**
  * 获取gateway SPI
  * @param form_data
  */
-export function get_gateway_spi(id, group, instance_id) {
+export function get_gateway_spi(id, group, instance_id, spi_interface) {
   return request({
     url: '/gateway/get_spi_list',
     method: 'get',
-    params: {id: id, group: group, instance_id: instance_id}
+    params: {id: id, group: group, instance_id: instance_id, spi_interface: spi_interface}
   })
 }
 
@@ -127,6 +139,19 @@ export function save_gateway_config(form_data) {
     data: form_data
   })
 }
+
+/**
+ * 保存gateway SPI
+ * @param form_data
+ */
+export function save_gateway_spi(form_data) {
+  return request({
+    url: '/gateway/save_spi',
+    method: 'post',
+    data: form_data
+  })
+}
+
 
 
 

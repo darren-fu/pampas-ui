@@ -1,7 +1,5 @@
 <template>
   <div>
-
-
     <el-table v-if="tableData.length > 0"
               v-loading="listLoading"
               :data="tableData"

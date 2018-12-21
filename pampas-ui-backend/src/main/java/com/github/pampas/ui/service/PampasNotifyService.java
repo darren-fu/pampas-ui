@@ -16,4 +16,5 @@ public interface PampasNotifyService extends IngressService {
 
 
     Response notifyGatewayConfigUpdate(String group, String gatewayInstanceId, String configSpiClass);
+    Response notifyGatewaySpiUpdate(String group, String gatewayInstanceId, String spiInterface);
 }

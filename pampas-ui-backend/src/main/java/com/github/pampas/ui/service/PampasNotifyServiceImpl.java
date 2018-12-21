@@ -9,6 +9,7 @@ import com.github.pampas.ui.base.vo.Response;
 import com.github.pampas.ui.service.base.GatewayInstanceService;
 import com.github.pampas.ui.service.base.GatewaySpiService;
 import com.github.pampas.ui.utils.HttpTools;
+import lombok.Data;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,9 +24,9 @@ import java.util.List;
  * Date: 2018-12-17
  */
 @Service
-public class GatewayNotifyServiceImpl implements PampasNotifyService {
+public class PampasNotifyServiceImpl implements PampasNotifyService {
 
-    private static final Logger log = LoggerFactory.getLogger(GatewayNotifyServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(PampasNotifyServiceImpl.class);
 
     @Autowired
     private GatewaySpiService gatewaySpiService;
@@ -82,4 +83,49 @@ public class GatewayNotifyServiceImpl implements PampasNotifyService {
         }
         return Response.buildSuccessResponseWithInfo(sb.toString());
     }
+
+    @Override
+    public Response notifyGatewaySpiUpdate(String group, String gatewayInstanceId, String spiInterface) {
+        AssertTools.notEmpty(group, "必须指定推送的网关分组");
+
+        List<GatewayInstance> gatewayList = gatewayInstanceService.getGatewayList(group, gatewayInstanceId);
+        NotifyResult notifyResult = new NotifyResult();
+        for (GatewayInstance gatewayInstance : gatewayList) {
+            String url = "http://" + gatewayInstance.getHost() + ":" + gatewayInstance.getProxyPort() + PampasConsts.GATEWAY_REQ_PREFIX
+                    + "/" + PampasConsts.GatewayOperation.REFRESH_SPI_META_CONFIG;
+            log.info("通知网关更新SPI—META配置:[{},{},{}],URL:{}", group, gatewayInstanceId, url);
+            doNotify(url, notifyResult);
+        }
+        StringBuilder sb = StringBuilderFactory.DEFAULT.stringBuilder();
+        sb.append("推送完成!")
+                .append("成功：").append(notifyResult.success).append("个");
+        if (notifyResult.failed > 0) {
+            sb.append("；失败：" + notifyResult.failed).append("个");
+            sb.append("；详情：" + notifyResult.msg);
+        }
+        return Response.buildSuccessResponseWithInfo(sb.toString());
+    }
+
+    @Data
+    public static class NotifyResult {
+        private int success;
+        private int failed;
+        private String msg;
+    }
+
+    private NotifyResult doNotify(String url, NotifyResult result) {
+        try {
+            CloseableHttpResponse closeableHttpResponse = HttpTools.doGet(url);
+            if (closeableHttpResponse.getStatusLine().getStatusCode() == 200) {
+                log.info("推送成功:{}", url);
+                result.success += 1;
+            }
+        } catch (Exception e) {
+            result.msg += e.getMessage() + ";";
+            result.failed += 1;
+            log.error("推送:{}失败:{}", url, e.getMessage(), e);
+        }
+        return result;
+    }
+
 }

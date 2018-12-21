@@ -16,29 +16,28 @@ import java.util.List;
  * Date: 2018-12-17
  */
 @Data
-@ApiModel(value = "保存网关Config请求")
+@ApiModel(value = "保存网关Spi请求")
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-public class GatewayConfigSaveReq implements Request {
+public class GatewaySpiSaveReq implements Request {
 
     private String gatewayGroup;
     private String gatewayInstanceId;
-    private String configSpiClass;
-    @NotEmpty(message = "配置列表不能为空")
+    private String spiInterface;
+    @NotEmpty(message = "插件列表不能为空")
     private List<KeyAndVal> list;
 
 
     @Data
     @ApiModel(value = "键值对")
     @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-    public static class KeyAndVal{
+    public static class KeyAndVal {
+
         @NotNull(message = "id不能为空")
         private Integer id;
 
-        private String key;
+        private Integer order;
 
-        private String value;
-
-        private Boolean required;
+        private Boolean status;
     }
 
 
