@@ -1,9 +1,9 @@
 <template>
   <div class="app-container">
     <el-row>
-      <el-col :span="10">
+      <el-col :span="11" >
         <el-input
-          placeholder="输入名称进行筛选"
+          placeholder="输入名称进行筛选网关" size="small"
           v-model="filterGatewayText">
         </el-input>
         <el-radio-group v-model="mode" size="mini" style="margin: 5px 0">
@@ -23,6 +23,7 @@
           class="r_tree"
           :data="gatewayTreeData"
           show-checkbox
+          highlight-current
           check-on-click-node
           :expand-on-click-node="false"
           node-key="id"
@@ -30,11 +31,14 @@
           :default-checked-keys="defaultGatewayCheckedIds"
           :props="defaultProps">
         </el-tree>
+
       </el-col>
-      <el-col :span="8" :offset="0">
+      <div class="centerdiv"></div>
+
+      <el-col :span="8">
         <el-input
-          style="margin-left: 10px"
-          placeholder="输入名称进行筛选"
+          style="margin-left: 10px" size="small"
+          placeholder="输入名称进行筛选关联的路由"
           v-model="filterRuleText">
         </el-input>
         <el-tree
@@ -60,11 +64,9 @@
       </span>
         </el-tree>
       </el-col>
-      <el-col :span="5" :offset="1">
+      <el-col :span="4" style="margin-left: 30px">
         <el-button size="mini" type="" @click="reset">重置</el-button>
-        <el-button type="primary" size="mini" icon="el-icon-check" @click="saveRel">保存
-        </el-button>
-
+        <el-button type="primary" size="mini" icon="el-icon-check" @click="saveRel">保存</el-button>
       </el-col>
     </el-row>
   </div>
@@ -193,6 +195,14 @@
 
 <style scoped>
 
+  .centerdiv {
+    float: left;
+    width: 1px;
+    border-right: 1px dashed #a1a3a9;
+    padding-bottom: 700px; /*关键*/
+    margin-top: 50px;
+  }
+
 </style>
 <style>
   .custom-tree-node {
@@ -202,5 +212,12 @@
     justify-content: space-between;
     font-size: 14px;
     padding-right: 8px;
+  }
+  .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content {
+    background-color: #e9e9eb;
+    color: #ff4d51;
+  }
+  .el-tree-node__content:hover {
+    background-color: #bbbbbb;
   }
 </style>
