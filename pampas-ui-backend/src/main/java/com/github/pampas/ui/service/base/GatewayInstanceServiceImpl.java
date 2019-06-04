@@ -49,9 +49,20 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
 
     @Override
     public List<GatewayInstance> getGateway(Integer... gatewayId) {
+        if (gatewayId == null || gatewayId.length == 0) {
+            return Collections.emptyList();
+        }
+        return getGateway(Arrays.asList(gatewayId));
+    }
+
+    @Override
+    public List<GatewayInstance> getGateway(List<Integer> getewayIdList) {
+        if (CollectionUtils.isEmpty(getewayIdList)) {
+            return Collections.emptyList();
+        }
         GatewayInstanceCondition condition = new GatewayInstanceCondition();
         GatewayInstanceCondition.Criteria criteria = condition.createCriteria();
-        criteria.andIdIn(Arrays.asList(gatewayId));
+        criteria.andIdIn(getewayIdList);
 
         return gatewayInstanceMapper.selectByExample(condition);
     }
@@ -124,7 +135,9 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
 
     @Override
     public Map<String, Long> countRouteRuleRel(Integer... gatewayId) {
-
+        if (gatewayId == null || gatewayId.length == 0) {
+            return Collections.emptyMap();
+        }
 
         GatewayInstanceCondition condition = new GatewayInstanceCondition();
         GatewayInstanceCondition.Criteria criteria = condition.createCriteria();
@@ -167,7 +180,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void saveRel(List<Integer> gatewayIdList, List<Integer> ruleIdList) {
         AssertTools.notNull(gatewayIdList, "网关不能为空");
         List<String> instanceIdList = new ArrayList<>();

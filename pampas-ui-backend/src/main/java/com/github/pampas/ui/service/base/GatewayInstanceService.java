@@ -27,6 +27,14 @@ public interface GatewayInstanceService {
     List<GatewayInstance> getGateway(Integer... gatewayId);
 
     /**
+     * Gets gateway.
+     *
+     * @param getewayIdList the geteway id list
+     * @return the gateway
+     */
+    List<GatewayInstance> getGateway(List<Integer> getewayIdList);
+
+    /**
      * 查询列表 精确查询
      *
      * @param group             the group

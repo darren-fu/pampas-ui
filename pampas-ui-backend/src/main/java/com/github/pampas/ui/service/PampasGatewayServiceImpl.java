@@ -1,5 +1,6 @@
 package com.github.pampas.ui.service;
 
+import com.github.pampas.common.base.PampasConsts;
 import com.github.pampas.common.tools.AssertTools;
 import com.github.pampas.common.tools.StreamTools;
 import com.github.pampas.storage.entity.*;
@@ -35,6 +36,9 @@ public class PampasGatewayServiceImpl implements PampasGatewayService {
 
     @Autowired
     private GatewaySpiService gatewaySpiService;
+
+    @Autowired
+    private PampasNotifyService pampasNotifyService;
 
     @Override
     public Response<GatewayInstanceResp> getGateway(Integer gatewayId) {
@@ -78,7 +82,15 @@ public class PampasGatewayServiceImpl implements PampasGatewayService {
 
     @Override
     public Response saveRel(RuleRelGatewaySaveReq req) {
+        AssertTools.notEmpty(req.getGatewayIdList(), "网关ID不能为空");
         gatewayInstanceService.saveRel(req.getGatewayIdList(), req.getRuleIdList());
+
+        List<GatewayInstance> gatewayInstanceList = gatewayInstanceService.getGateway(req.getGatewayIdList());
+        for (GatewayInstance instance : gatewayInstanceList) {
+            pampasNotifyService.notifyConfigLoaderWithKey(instance, PampasConsts.ConfigLoaderKey.ROUTE_RULE);
+            pampasNotifyService.notifyConfigLoaderWithName(instance, "config-loader-auth-filter");
+        }
+
         return Response.buildSuccessEmptyResponse();
     }
 

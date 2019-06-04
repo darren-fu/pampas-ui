@@ -181,6 +181,9 @@
           this.defaultRuleExpandIds.push(this.ruleTreeData[0].id)
           return;
         }
+        if(!gateway_id){
+          return;
+        }
         get_rel_rules(gateway_id).then(resp => {
           let ids = resp.data.map(v => {
             return v.id;

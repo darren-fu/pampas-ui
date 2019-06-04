@@ -35,6 +35,30 @@ public class PampasNotifyServiceImpl implements PampasNotifyService {
     private GatewayInstanceService gatewayInstanceService;
 
     @Override
+    public Response notifyConfigLoaderWithKey(GatewayInstance gatewayInstance, String configLoaderKey) {
+        String url = "http://" + gatewayInstance.getHost() + ":" + gatewayInstance.getProxyPort() + PampasConsts.GATEWAY_REQ_PREFIX
+                + "/" + PampasConsts.GatewayOperation.REFRESH_CONFIG_BY_KEY
+                + "/" + configLoaderKey;
+        log.info("通知网关更新自定义配置:[{},{},{}],URL:{}", gatewayInstance, configLoaderKey, url);
+        NotifyResult notifyResult = new NotifyResult();
+        doNotify(url, notifyResult);
+
+        return Response.buildSuccessResponseWithInfo(notifyResult.toMessage());
+    }
+
+    @Override
+    public Response notifyConfigLoaderWithName(GatewayInstance gatewayInstance, String configLoaderName) {
+        String url = "http://" + gatewayInstance.getHost() + ":" + gatewayInstance.getProxyPort() + PampasConsts.GATEWAY_REQ_PREFIX
+                + "/" + PampasConsts.GatewayOperation.REFRESH_CONFIG_BY_NAME
+                + "/" + configLoaderName;
+        log.info("通知网关更新自定义配置:[{},{},{}],URL:{}", gatewayInstance, configLoaderName, url);
+        NotifyResult notifyResult = new NotifyResult();
+        doNotify(url, notifyResult);
+
+        return Response.buildSuccessResponseWithInfo(notifyResult.toMessage());
+    }
+
+    @Override
     public String notifyConfigLoaderWithKey(String group, String gatewayInstanceId, String configLoaderKey) {
         return null;
     }
@@ -111,6 +135,17 @@ public class PampasNotifyServiceImpl implements PampasNotifyService {
         private int success;
         private int failed;
         private String msg;
+
+        public String toMessage() {
+            StringBuilder sb = StringBuilderFactory.DEFAULT.stringBuilder();
+            sb.append("推送完成!")
+                    .append("成功：").append(this.success).append("个");
+            if (this.failed > 0) {
+                sb.append("；失败：" + this.failed).append("个");
+                sb.append("；详情：" + this.msg);
+            }
+            return sb.toString();
+        }
     }
 
     private NotifyResult doNotify(String url, NotifyResult result) {
