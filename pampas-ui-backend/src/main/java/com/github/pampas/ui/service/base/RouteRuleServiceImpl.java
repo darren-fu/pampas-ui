@@ -117,7 +117,7 @@ public class RouteRuleServiceImpl implements RouteRuleService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public RouteRule save(RouteRule routeRule) {
         if (routeRule.getId() != null) {
             int i = routeRuleMapper.updateByPrimaryKeySelective(routeRule);
@@ -132,7 +132,7 @@ public class RouteRuleServiceImpl implements RouteRuleService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void delete(Integer ruleId) {
         AssertTools.notNull(ruleId, "id不能为空");
         int i = routeRuleMapper.deleteByPrimaryKey(ruleId);
@@ -141,7 +141,7 @@ public class RouteRuleServiceImpl implements RouteRuleService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void saveRel(Integer ruleId, List<Integer> gatewayIdList) {
         AssertTools.notNull(ruleId, "路由规则不能为空");
         RouteRule routeRule = this.getRouteRule(ruleId);
